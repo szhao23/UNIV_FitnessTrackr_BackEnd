@@ -3,12 +3,18 @@ const express = require('express');
 const server = express();
 const morgan = require('morgan');
 const chalk = require('chalk');
+const cors = require('cors');
 const {PORT = 3000} = process.env;
+
 
 const { client } = require('./db');
 client.connect();
 
+server.use(cors());
+
 // API Router here
+
+server.use('/api', require('./api'));
 
 // logging middleware
 server.use(morgan('dev'));
