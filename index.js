@@ -12,15 +12,15 @@ client.connect();
 
 server.use(cors());
 
-// API Router here
-
-server.use('/api', require('./api'));
 
 // logging middleware
 server.use(morgan('dev'));
 // parsing middleware
 server.use(express.json());
 server.use(express.urlencoded({extended: true}));
+
+// API Router here
+server.use('/api', require('./api'));
 
 // error handling middleware
 server.use((error, req, res, next) => {
