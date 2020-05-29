@@ -1,4 +1,7 @@
-const { client, createUser } = require('./');
+const { createUser } = require('./');
+const client = require('./client');
+const bcrypt = require('bcrypt');
+const SALT_COUNT = 10;
 
 async function dropTables() {
   try {
@@ -44,7 +47,15 @@ async function createInitialUsers() {
       { username: 'sandra', password: 'sandra123' },
       { username: 'glamgal', password: 'glamgal123' },
     ]
-    const users = await Promise.all(usersToCreate.map(createUser));
+    const users = await Promise.all(usersToCreate.map(async user => {
+      const hashedPassword = bcrypt.hashSync(user.username, SALT_COUNT);
+      const createdUser = await createUser({
+        username: user.username,
+        password: hashedPassword // not the plaintext
+      });
+      console.log('>>>>>>>>> user', user);
+      return createdUser
+    }));
 
     console.log('Users created:');
     console.log(users);

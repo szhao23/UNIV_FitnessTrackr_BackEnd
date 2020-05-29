@@ -7,7 +7,7 @@ const cors = require('cors');
 const {PORT = 3000} = process.env;
 
 
-const { client } = require('./db');
+const client = require('./db/client');
 client.connect();
 
 server.use(cors());

@@ -1,9 +1,12 @@
 const axios = require('axios');
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 const {API_URL} = process.env;
+const SALT_COUNT = 10;
 
 const { rebuildDB, testDB } = require('../db/seedData');
-const { client, getUserById } = require('../db/index');
+const { getUserById } = require('../db/index');
+const client = require('../db/client')
 
 describe('Application', () => {
   beforeAll(async() => {
@@ -53,6 +56,7 @@ describe('Application', () => {
             WHERE id = $1;
           `, [registeredUser.id]);
           expect(queriedUser.password).not.toBe(newUser.password);
+          expect(await bcrypt.compare(newUser.password, queriedUser.password)).toBe(true);
         });
         it('Throw errors for duplicate username', async () => {
           const duplicateResponse = await axios.post(`${API_URL}/api/users/register`, newUser);
