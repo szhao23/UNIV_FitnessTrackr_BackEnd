@@ -5,10 +5,11 @@ const {API_URL} = process.env;
 const SALT_COUNT = 10;
 
 const { rebuildDB, testDB } = require('../db/seedData');
-const { getUserById } = require('../db/index');
+const { getUserById, createActivity } = require('../db');
 const client = require('../db/client')
 
 describe('Application', () => {
+  let token;
   beforeAll(async() => {
     await rebuildDB();
   })
@@ -33,7 +34,7 @@ describe('Application', () => {
   describe('Users', () => {
     let newUser = { username: 'robert', password: 'bobbylong321' };
     let newUserShortPassword = { username: 'robertShort', password: 'bobby21' };
-    describe('Login', () => {
+    describe('User', () => {
       describe('POST /users/register', () => {
         let registeredUser;
         let tooShortResponse;
@@ -67,10 +68,14 @@ describe('Application', () => {
         });
       });
       describe('POST /users/login', () => {
-        it('Logs in the user. Requires username and password, and verifies that plaintext login password matches the saved hashed password before returning a JSON Web Token.', async () => {
-          expect(false).toBe(true);
+        it('Logs in the user. Requires username and password, and verifies that hashed login password matches the saved hashed password.', async () => {
+          const {data} = await axios.post(`${API_URL}/api/users/login`, newUser);
+          token = data.token;
+          expect(data.token).toBeTruthy();
         });
-        it('Stores the id and username in the token.', async () => {
+        it('Returns a JSON Web Token. Stores the id and username in the token.', async () => {
+          console.log('>>>>>>>>> token', token);
+          
           expect(false).toBe(true);
         });
       })
@@ -81,5 +86,38 @@ describe('Application', () => {
       });
     });
   });
-  
+  describe('Activities', () => {
+    describe('GET /activities', () => {
+      it('Just returns a list of all activities in the database', async () => {
+        const curls = { name: 'curls', description: '4 sets of 15.' };
+        const createdActivity = await createActivity(curls);
+        const {data: activities} = await axios.get(`${API_URL}/api/activities`);
+        expect(Array.isArray(activities)).toBe(true);
+        expect(activities.length).toBeGreaterThan(0);
+        expect(activities[0].name).toBeTruthy();
+        expect(activities[0].description).toBeTruthy();
+        const [filteredActivity] = activities.filter(activity => activity.id === createdActivity.id);
+        expect(filteredActivity.name).toEqual(curls.name);
+        expect(filteredActivity.description).toEqual(curls.description);
+      });
+    });
+    describe('POST /activities (*)', () => {
+      it('Creates a new activity', async () => {
+        const activity = await axios.post(`${API_URL}/api/activities`, { name: 'Bicep Curls', description: 'They hurt, but you will thank you later' }, { headers: {'Authorization': `Bearer ${token}`} });
+        expect(false).toBe(true);
+      });
+    });
+    describe('PATCH /activities/:activityId (*)', () => {
+      it('Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)', async () => {
+
+        expect(false).toBe(true);
+      });
+    });
+    describe('GET /activities/:activityId/routines', () => {
+      it('Get a list of all public routines which feature that activity', async () => {
+
+        expect(false).toBe(true);
+      });
+    });
+  });
 });

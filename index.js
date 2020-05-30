@@ -24,7 +24,7 @@ server.use('/api', require('./api'));
 
 // error handling middleware
 server.use((error, req, res, next) => {
-  console.error('SERVER ERROR: error');
+  console.error('SERVER ERROR: ', error);
   res.send(error);
 })
 server.listen(PORT, () => {
