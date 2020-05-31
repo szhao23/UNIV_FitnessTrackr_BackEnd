@@ -1,4 +1,5 @@
-const client = require('./client')
+const client = require('./client');
+const util = require('./util');
 
 // database functions
 async function getAllActivities(){
@@ -24,8 +25,25 @@ async function createActivity({ name, description }){
     throw error;
   }}
 // return the new activity
-async function updateActivity({ id, name, description }){
-  return
+async function updateActivity(fields = {}){
+  const { id } = fields;
+  delete fields.id;
+  let activity;
+  try {
+    if (util.dbFields(fields).insert.length > 0) {
+      const {rows} = await client.query(`
+        UPDATE activities
+        SET ${ util.dbFields(fields).insert }
+        WHERE id=${ id }
+        RETURNING *;
+      `, Object.values(fields));
+      activity = rows[0];
+    }
+  } catch (error) {
+    console.error(error)
+  }
+
+  return activity;
 }
 // don't try to update the id
 // do update the name and description
