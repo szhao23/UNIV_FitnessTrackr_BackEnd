@@ -1,12 +1,16 @@
 const axios = require('axios');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const {API_URL} = process.env;
+const jwt = require('jsonwebtoken');
+const {API_URL, JWT_SECRET} = process.env;
 const SALT_COUNT = 10;
 
 const { rebuildDB, testDB } = require('../db/seedData');
 const { getUserById, createActivity, updateActivity } = require('../db');
 const client = require('../db/client')
+
+// example of axios delete request
+// axios.delete(`${API_URL}/api/routines/${routine.id}`, {data: { /* req body data */ }, headers: {'Authorization': `Bearer ${token}`} });
 
 describe('API', () => {
   let token;
@@ -22,8 +26,8 @@ describe('API', () => {
   describe('Users', () => {
     let newUser = { username: 'robert', password: 'bobbylong321' };
     let newUserShortPassword = { username: 'robertShort', password: 'bobby21' };
+    let registeredUser;
     describe('POST /users/register', () => {
-      let registeredUser;
       let tooShortResponse;
       beforeAll(async() => {
         const successResponse = await axios.post(`${API_URL}/api/users/register`, newUser);
@@ -61,9 +65,9 @@ describe('API', () => {
         expect(data.token).toBeTruthy();
       });
       it('Returns a JSON Web Token. Stores the id and username in the token.', async () => {
-        console.log('>>>>>>>>> token', token);
-        
-        expect(false).toBe(true);
+        const parsedToken = jwt.verify(token, JWT_SECRET);
+        expect(parsedToken.id).toEqual(registeredUser.id);
+        expect(parsedToken.username).toEqual(registeredUser.username);
       });
     })
     describe('GET /users/:username/routines', () => {

@@ -12,6 +12,30 @@ async function getAllActivities(){
     throw error;
   }
 }
+async function getActivityById(id){
+  try {
+    const {rows: [activity]} = await client.query(`
+      SELECT * FROM activities
+      WHERE id = $1
+    `, [id]);
+    return activity;
+  } catch (error) {
+    throw error;
+  }
+}
+async function getActivitiesByRoutineId(id) {
+  try {
+    const { rows: activities } = await client.query(`
+    SELECT activities.*
+    FROM activities 
+    JOIN routine_activities ON routine_activities."activityId" = activities.id
+    WHERE routine_activities."routineId" = $1;
+  `, [id]);
+  return activities;
+  } catch (error) {
+    console.error(error);
+  }
+}
 // select and return an array of all activities
 async function createActivity({ name, description }){
   try {
@@ -50,6 +74,8 @@ async function updateActivity(fields = {}){
 // return the updated activity
 module.exports = {
   getAllActivities,
+  getActivityById,
+  getActivitiesByRoutineId,
   createActivity,
   updateActivity,
 }

@@ -1,4 +1,4 @@
-const { createUser, getAllActivities, createActivity, getAllRoutines, createRoutine, createRoutineActivity } = require('./');
+const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, getAllRoutines, createRoutine, createRoutineActivity } = require('./');
 const client = require('./client');
 const bcrypt = require('bcrypt');
 const SALT_COUNT = 10;
@@ -121,9 +121,10 @@ async function createInitialRoutines() {
     console.log('starting to create routines...');
 
     const routinesToCreate = [
-      {creatorId: 2, isPublic: false, name: 'Bicep Day', goal: 'Work the Back and Biceps.'},
-      {creatorId: 1, isPublic: true, name: 'Chest Day', goal: 'To beef up the Chest and Triceps!'},
-      {creatorId: 1, isPublic: false, name: 'Leg Day', goal: 'Running, stairs, squats'},
+      {creatorId: 2, public: false, name: 'Bicep Day', goal: 'Work the Back and Biceps.'},
+      {creatorId: 1, public: true, name: 'Chest Day', goal: 'To beef up the Chest and Triceps!'},
+      {creatorId: 1, public: false, name: 'Leg Day', goal: 'Running, stairs, squats'},
+      {creatorId: 2, public: true, name: 'Cardio Day', goal: 'Running, stairs. Stuff that gets your heart pumping!'},
     ]
     const routines = await Promise.all(routinesToCreate.map(routine => createRoutine(routine)));
     console.log('Routines Created: ', routines)
@@ -136,7 +137,7 @@ async function createInitialRoutines() {
 async function createInitialRoutineActivities() {
   try {
     console.log('starting to create routine_activities...');
-    const [bicepRoutine, chestRoutine, legRoutine] = await getAllRoutines();
+    const [bicepRoutine, chestRoutine, legRoutine, cardioRoutine] = await getRoutinesWithoutActivities();
     const [bicep1, bicep2, chest1, chest2, leg1, leg2, leg3] = await getAllActivities();
 
     const routineActivitiesToCreate = [
@@ -178,6 +179,18 @@ async function createInitialRoutineActivities() {
       },
       {
         routineId: legRoutine.id,
+        activityId: leg3.id,
+        count: 10,
+        duration: 10000 
+      },
+      {
+        routineId: cardioRoutine.id,
+        activityId: leg2.id,
+        count: 10,
+        duration: 10000 
+      },
+      {
+        routineId: cardioRoutine.id,
         activityId: leg3.id,
         count: 10,
         duration: 10000 
