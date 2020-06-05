@@ -132,6 +132,16 @@ async function updateRoutine({id, public: isPublic, name, goal}) {
     console.error(error);
   }
 }
+async function deleteRoutine(id) {
+  try {
+    await client.query(`
+        DELETE FROM routines 
+        WHERE id = $1;
+    `, [id]);
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 module.exports = {
   getRoutineById,
@@ -143,4 +153,5 @@ module.exports = {
   getPublicRoutinesByActivity,
   createRoutine,
   updateRoutine,
+  deleteRoutine,
 }

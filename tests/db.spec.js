@@ -5,7 +5,7 @@ const {API_URL} = process.env;
 const SALT_COUNT = 10;
 
 const { rebuildDB, testDB } = require('../db/seedData');
-const { getUserById, getAllActivities, getActivityById, createActivity, updateActivity, getRoutineById, getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getPublicRoutinesByUser, getPublicRoutinesByActivity, createRoutine, updateRoutine } = require('../db');
+const { getUserById, getAllActivities, getActivityById, createActivity, updateActivity, getRoutineById, getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getPublicRoutinesByUser, getPublicRoutinesByActivity, createRoutine, updateRoutine, deleteRoutine } = require('../db');
 const client = require('../db/client');
 
 describe('Database', () => {
@@ -32,6 +32,7 @@ describe('Database', () => {
     })
   })
   describe('Routines', () => {
+    let routineToCreateAndUpdate;
     describe('getActivityById', () => {
       it('gets activities by their id', async () => {
         const activity = await getActivityById(1);
@@ -112,7 +113,6 @@ describe('Database', () => {
         expect(routine.public).toBe(true);
       })
     })
-    let routineToCreateAndUpdate;
     describe('createRoutine', () => {
       it('creates and returns the new routine', async () => {
         routineToCreateAndUpdate = await createRoutine({creatorId: 2, public: true, name: 'BodyWeight Day', goal: 'Do workouts that can be done from home, no gym or weights required.'});
@@ -136,6 +136,18 @@ describe('Database', () => {
         expect(routineToCreateAndUpdate.public).toBe(queriedRoutine.public);
         expect(routineToCreateAndUpdate.name).toBe(queriedRoutine.name);
         expect(routineToCreateAndUpdate.goal).toBe(queriedRoutine.goal);
+      })
+      
+    })
+    describe('updateRoutine', () => {
+      it('remove routine from database', async () => {
+        await deleteRoutine(routineToCreateAndUpdate.id);
+        const {rows: [routine]} = await client.query(`
+          SELECT * 
+          FROM routines
+          WHERE id = $1;
+        `, [routineToCreateAndUpdate.id]);
+        expect(routine).toBeFalsy();
       })
       
     })

@@ -72,6 +72,9 @@ describe('API', () => {
     })
     describe('GET /users/:username/routines', () => {
       it('Gets a list of public routines for a particular user.', async () => {
+        const userId = 2;
+        const userWithRoutines = await getUserById(userId);
+        const {data: routines} = await axios.get(`${API_URL}/api/users/${userWithRoutines}/routines`);
         expect(false).toBe(true);
       });
     });
