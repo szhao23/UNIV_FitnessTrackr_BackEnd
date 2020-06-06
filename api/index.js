@@ -55,4 +55,8 @@ router.use('/users', usersRouter);
 const activitiesRouter = require('./activities');
 router.use('/activities', activitiesRouter);
 
+// ROUTER: /api/routines
+const routinesRouter = require('./routines');
+router.use('/routines', routinesRouter);
+
 module.exports = router;
