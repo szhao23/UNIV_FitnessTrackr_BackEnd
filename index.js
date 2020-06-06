@@ -19,7 +19,7 @@ server.use(morgan('dev'));
 server.use(express.json());
 server.use(express.urlencoded({extended: true}));
 
-// API Router here
+// Router: /api
 server.use('/api', require('./api'));
 
 // error handling middleware

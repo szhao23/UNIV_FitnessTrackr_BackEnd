@@ -47,10 +47,11 @@ router.use((req, res, next) => {
   next();
 });
 
-// Routers
+// ROUTER: /api/users
 const usersRouter = require('./users');
 router.use('/users', usersRouter);
 
+// ROUTER: /api/activities
 const activitiesRouter = require('./activities');
 router.use('/activities', activitiesRouter);
 
