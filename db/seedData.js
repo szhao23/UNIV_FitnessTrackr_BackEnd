@@ -1,4 +1,4 @@
-const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, getAllRoutines, createRoutine, createRoutineActivity } = require('./');
+const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, getAllRoutines, createRoutine, addActivityToRoutine } = require('./');
 const client = require('./client');
 const bcrypt = require('bcrypt');
 const SALT_COUNT = 10;
@@ -196,7 +196,7 @@ async function createInitialRoutineActivities() {
         duration: 10000 
       },
     ]
-    const routineActivities = await Promise.all(routineActivitiesToCreate.map(createRoutineActivity));
+    const routineActivities = await Promise.all(routineActivitiesToCreate.map(addActivityToRoutine));
     console.log('routine_activities created: ', routineActivities)
     console.log('Finished creating routine_activities!')
   } catch (error) {

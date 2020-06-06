@@ -5,7 +5,7 @@ const {API_URL} = process.env;
 const SALT_COUNT = 10;
 
 const { rebuildDB, testDB } = require('../db/seedData');
-const { getUserById, getAllActivities, getActivityById, createActivity, updateActivity, getRoutineById, getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getPublicRoutinesByUser, getPublicRoutinesByActivity, createRoutine, updateRoutine, deleteRoutine, createUser, getUser } = require('../db');
+const { getUserById, getAllActivities, getActivityById, createActivity, updateActivity, getRoutineById, getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getPublicRoutinesByUser, getPublicRoutinesByActivity, createRoutine, updateRoutine, destroyRoutine, createUser, getUser, getRoutineActivitiesByRoutine, addActivityToRoutine, updateRoutineActivity, destroyRoutineActivity } = require('../db');
 const client = require('../db/client');
 
 describe('Database', () => {
@@ -182,9 +182,9 @@ describe('Database', () => {
       })
       
     })
-    describe('updateRoutine', () => {
-      it('remove routine from database', async () => {
-        await deleteRoutine(routineToCreateAndUpdate.id);
+    describe('destroyRoutine', () => {
+      it('removes routine from database', async () => {
+        await destroyRoutine(routineToCreateAndUpdate.id);
         const {rows: [routine]} = await client.query(`
           SELECT * 
           FROM routines
@@ -192,7 +192,50 @@ describe('Database', () => {
         `, [routineToCreateAndUpdate.id]);
         expect(routine).toBeFalsy();
       })
-      
+      it('Deletes all the routine_activities whose routine is the one being deleted.', async () => {
+        const queriedRoutineActivities = await getRoutineActivitiesByRoutine(routineToCreateAndUpdate)
+        expect(queriedRoutineActivities.length).toBe(0);
+      })
     })
+  })
+  describe('Routine Activities', () => {
+    const routineActivityData = {
+      routineId: 4,
+      activityId: 8,
+      count: 10,
+      duration: 10000 
+    }
+    let routineActivityToCreateAndUpdate;
+    describe('addActivityToRoutine({ routineId, activityId, count, duration })', () => {
+      it('creates a new routine_activity, and return it', async () => {
+        routineActivityToCreateAndUpdate = await addActivityToRoutine(routineActivityData);
+        
+        expect(routineActivityToCreateAndUpdate.routineId).toBe(routineActivityData.routineId);
+        expect(routineActivityToCreateAndUpdate.activityId).toBe(routineActivityData.activityId);
+        expect(routineActivityToCreateAndUpdate.count).toBe(routineActivityData.count);
+        expect(routineActivityToCreateAndUpdate.duration).toBe(routineActivityData.duration);
+      })
+    })
+    describe('updateRoutineActivity({ id, count, duration })', () => {
+      it('Finds the routine with id equal to the passed in id. Updates the count or duration as necessary.', async () => {
+        const newRoutineActivityData = {id: routineActivityToCreateAndUpdate.id, count: 15, duration: 150};
+        routineActivityToCreateAndUpdate = await updateRoutineActivity(newRoutineActivityData);
+        expect(routineActivityToCreateAndUpdate.id).toBe(newRoutineActivityData.id);
+        expect(routineActivityToCreateAndUpdate.count).toBe(newRoutineActivityData.count);
+        expect(routineActivityToCreateAndUpdate.duration).toBe(newRoutineActivityData.duration);
+      })
+    })
+    describe('destroyRoutineActivity(id)', () => {
+      it('remove routine_activity from database', async () => {
+        const deletedRoutine = await destroyRoutineActivity(routineActivityToCreateAndUpdate.id);
+        expect(deletedRoutine.id).toBe(routineActivityToCreateAndUpdate.id);
+        const {rows} = await client.query(`
+          SELECT * FROM routine_activities
+          WHERE id = ${deletedRoutine.id}
+        `)
+        expect(rows.length).toBe(0);
+      })
+    })
+
   })
 });

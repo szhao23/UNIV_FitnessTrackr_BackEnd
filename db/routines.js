@@ -132,12 +132,19 @@ async function updateRoutine({id, public: isPublic, name, goal}) {
     console.error(error);
   }
 }
-async function deleteRoutine(id) {
+async function destroyRoutine(id) {
   try {
     await client.query(`
-        DELETE FROM routines 
-        WHERE id = $1;
+        DELETE FROM routine_activities 
+        WHERE "routineId" = $1;
     `, [id]);
+    const {rows: [routine]} = await client.query(`
+        DELETE FROM routines 
+        WHERE id = $1
+        RETURNING *
+    `, [id]);
+    console.log('>>>>>>>>> DELETED routine', routine);
+    return routine;
   } catch (error) {
     console.error(error);
   }
@@ -153,5 +160,5 @@ module.exports = {
   getPublicRoutinesByActivity,
   createRoutine,
   updateRoutine,
-  deleteRoutine,
+  destroyRoutine,
 }
