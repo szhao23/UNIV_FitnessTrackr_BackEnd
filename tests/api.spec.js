@@ -13,7 +13,7 @@ const client = require('../db/client')
 // axios.delete(`${API_URL}/api/routines/${routine.id}`, {data: { /* req body data */ }, headers: {'Authorization': `Bearer ${token}`} });
 
 describe('API', () => {
-  let token;
+  let token, registeredUser;
   beforeAll(async() => {
     await rebuildDB();
   })
@@ -26,7 +26,6 @@ describe('API', () => {
   describe('Users', () => {
     let newUser = { username: 'robert', password: 'bobbylong321' };
     let newUserShortPassword = { username: 'robertShort', password: 'bobby21' };
-    let registeredUser;
     describe('POST /users/register', () => {
       let tooShortResponse;
       beforeAll(async() => {
@@ -130,6 +129,8 @@ describe('API', () => {
     });
   });
   describe('Routines', () => {
+    let routineToCreateAndUpdate = {creatorId: 2, public: true, name: 'Eliptical Day', goal: 'Work on that Eliptical!'};
+    let routineToFail = {creatorId: 2, public: false, name: 'Eliptical Day 2', goal: 'Work on that Eliptical... again!'};
     describe('GET /routines', async () => {
       it('Returns a list of public routines, includes the activities with them', async () => {
         const publicRoutinesFromDB = await getAllPublicRoutines();
@@ -139,11 +140,18 @@ describe('API', () => {
     });
     
     describe('POST /routines (*)', () => {
-      it('Creates a new routine', async () => {
-        expect(false).toBe(true);
+      it('Creates a new routine, with the creatorId matching the logged in user', async () => {
+        const {data: respondedRoutine} = await axios.post(`${API_URL}/api/routines`, routineToCreateAndUpdate, { headers: {'Authorization': `Bearer ${token}`} });
+        
+        expect(respondedRoutine.name).toEqual(routineToCreateAndUpdate.name);
+        expect(respondedRoutine.goal).toEqual(routineToCreateAndUpdate.goal);
+        expect(respondedRoutine.name).toEqual(routineToCreateAndUpdate.name);
+        expect(respondedRoutine.creatorId).toEqual(registeredUser.id);
+        routineToCreateAndUpdate = respondedRoutine;
       });
-      xit('Requires logged in user', async () => {
-        expect(false).toBe(true);
+      it('Requires logged in user', async () => {
+        const {data: respondedRoutine} = await axios.post(`${API_URL}/api/routines`, routineToFail);
+        expect(respondedRoutine.description).toBeFalsy();
       });
     });
     describe('PATCH /routines/:routineId (**)', async () => {

@@ -18,8 +18,8 @@ router.get('/', async (req, res, next) => {
 // POST /routines
 router.post('/', requireUser, async (req, res, next) => {
   try {
-    const {name, description} = req.body;
-    const createdRoutine = await createRoutine({name, description});
+    const {name, goal} = req.body;
+    const createdRoutine = await createRoutine({creatorId: req.user.id, name, goal, public: req.body.public});
     res.send(createdRoutine)
   } catch (error) {
     next(error);
