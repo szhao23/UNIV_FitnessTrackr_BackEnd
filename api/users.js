@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { createUser, getUserByUsername, getPublicRoutinesByUser } = require('../db');
+const { createUser, getUserByUsername, getPublicRoutinesByUser, getUser } = require('../db');
 const SALT_COUNT = 10;
 
 // POST /api/users/login
@@ -18,27 +18,16 @@ router.post('/login', async (req, res, next) => {
   }
 
   try {
-    const user = await getUserByUsername(username);
-    console.log('>>>>>>>>> user', user);
+    const user = await getUser({username, password});
     if(!user) {
       next({
         name: 'IncorrectCredentialsError',
         message: 'Username or password is incorrect',
       })
-    }
-    bcrypt.compare(password, user.password, function(err, passwordsMatch) {
-      if (passwordsMatch) {
-        // return a JWT
-        const token = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, { expiresIn: '1w' });
+    } else {
+      const token = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, { expiresIn: '1w' });
         res.send({ message: "you're logged in!", token });
-      } else {
-        next({
-          name: 'IncorrectCredentialsError',
-          message: 'Username or password is incorrect',
-          error: err
-        });
-      }
-    });
+    };
   } catch (error) {
     console.log(error);
     next(error);

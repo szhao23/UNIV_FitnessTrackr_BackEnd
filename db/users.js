@@ -1,4 +1,7 @@
-const client = require('./client')
+const client = require('./client');
+const bcrypt = require('bcrypt');
+const SALT_COUNT = 10;
+
 
 // database functions
 
@@ -15,6 +18,22 @@ async function createUser({ username, password}) {
     throw error;
   }
 }
+async function getUser({username, password}) {
+  if (!username || !password) {
+    return;
+  }
+
+  try {
+    const user = await getUserByUsername(username);
+    console.log('>>>>>>>>> user', user);
+    if(!user) return;
+    const matchingPassword = bcrypt.compareSync(password, user.password);
+    if(!matchingPassword) return;
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
 async function getUserById(userId) {
   // first get the user
   try {
@@ -55,6 +74,7 @@ async function getUserByUsername(userName) {
 }
 module.exports = {
   createUser,
+  getUser,
   getUserById,
   getUserByUsername,
 }

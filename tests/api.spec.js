@@ -142,7 +142,7 @@ describe('API', () => {
       it('Creates a new routine', async () => {
         expect(false).toBe(true);
       });
-      it('Requires logged in user', async () => {
+      xit('Requires logged in user', async () => {
         expect(false).toBe(true);
       });
     });
@@ -150,7 +150,7 @@ describe('API', () => {
       it('Updates a routine, notably changing public/private, the name, or the goal', async () => {
         expect(false).toBe(true);
       });
-      it('Logged in user should be the owner of the modified object.', async () => {
+      xit('Logged in user should be the owner of the modified object.', async () => {
         expect(false).toBe(true);
       });
     });
@@ -158,7 +158,7 @@ describe('API', () => {
       it('Hard deletes a routine. Makes sure to delete all the routineActivities whose routine is the one being deleted.', async () => {
         expect(false).toBe(true);
       });
-      it('Logged in user should be the owner of the modified object.', async () => {
+      xit('Logged in user should be the owner of the modified object.', async () => {
         expect(false).toBe(true);
       });
     });
@@ -173,7 +173,7 @@ describe('API', () => {
       it('Updates the count or duration on the routine activity', async () => {
         expect(false).toBe(true);
       });
-      it('Logged in user should be the owner of the modified object.', async () => {
+      xit('Logged in user should be the owner of the modified object.', async () => {
         expect(false).toBe(true);
       });
     });
@@ -181,19 +181,9 @@ describe('API', () => {
       it('Removes an activity from a routine, uses hard delete', async () => {
         expect(false).toBe(true);
       });
-      it('Logged in user should be the owner of the modified object.', async () => {
+      xit('Logged in user should be the owner of the modified object.', async () => {
         expect(false).toBe(true);
       });
     });
-    
-
-
-
-
-
-
-
-
-
   });
 });
