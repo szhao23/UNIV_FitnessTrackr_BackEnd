@@ -102,6 +102,7 @@ describe('API', () => {
         activityToCreateAndUpdate = respondedActivity;
       });
       xit('Requires logged in user', async () => {
+        // Needs a test here
         expect(false).toBe(true);
       });
     });
@@ -113,6 +114,7 @@ describe('API', () => {
         expect(respondedActivity.description).toEqual(newActivityData.description);
       });
       xit('Requires logged in user', async () => {
+        // Needs a test here
         expect(false).toBe(true);
       });
     });
@@ -161,6 +163,7 @@ describe('API', () => {
         routineToCreateAndUpdate = respondedRoutine;
       });
       xit('Logged in user should be the owner of the modified object.', async () => {
+        // Needs a test here
         expect(false).toBe(true);
       });
     });
@@ -174,6 +177,7 @@ describe('API', () => {
         expect(shouldBeDeleted).toBeFalsy();
       });
       xit('Logged in user should be the owner of the modified object.', async () => {
+        // Needs a test here
         expect(false).toBe(true);
       });
     });
