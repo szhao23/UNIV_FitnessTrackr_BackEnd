@@ -25,7 +25,6 @@ async function getUser({username, password}) {
 
   try {
     const user = await getUserByUsername(username);
-    console.log('>>>>>>>>> user', user);
     if(!user) return;
     const matchingPassword = bcrypt.compareSync(password, user.password);
     if(!matchingPassword) return;

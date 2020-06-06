@@ -1,5 +1,17 @@
 const client = require('./client');
 
+async function getRoutineActivityById(id){
+  try {
+    const {rows: [routineActivity]} = await client.query(`
+      SELECT * FROM routine_activities
+      WHERE id = $1
+    `, [id]);
+    return routineActivity;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function addActivityToRoutine({
     routineId,
     activityId,
@@ -68,10 +80,22 @@ async function destroyRoutineActivity(id) {
     throw error;
   }
 }
+
+async function canEditRoutineActivity(routineActivityId, userId) {
+  const {rows: [routineFromRoutineActivity]} = await client.query(`
+      SELECT * FROM routine_activities
+      JOIN routines ON routine_activities."routineId" = routines.id
+      AND routine_activities.id = $1
+    `, [routineActivityId]);
+    return routineFromRoutineActivity.creatorId === userId;
+}
+
 module.exports = {
+  getRoutineActivityById,
   addActivityToRoutine,
   getAllRoutineActivities,
   getRoutineActivitiesByRoutine,
   updateRoutineActivity,
   destroyRoutineActivity,
+  canEditRoutineActivity,
 };

@@ -18,11 +18,9 @@ router.use(async (req, res, next) => {
     next();
   } else if (auth.startsWith(prefix)) {
     const token = auth.slice(prefix.length);
-    console.log('>>>>>>>>> token', token);
     
     try {
       const parsedToken = jwt.verify(token, JWT_SECRET);
-      console.log('>>>>>>>>> parsedToken', parsedToken);
       
       const id = parsedToken && parsedToken.id
       if (id) {
@@ -58,5 +56,9 @@ router.use('/activities', activitiesRouter);
 // ROUTER: /api/routines
 const routinesRouter = require('./routines');
 router.use('/routines', routinesRouter);
+
+// ROUTER: /api/routine_activities
+const routineActivitiesRouter = require('./routineActivities');
+router.use('/routine_activities', routineActivitiesRouter);
 
 module.exports = router;

@@ -143,7 +143,6 @@ async function destroyRoutine(id) {
         WHERE id = $1
         RETURNING *
     `, [id]);
-    console.log('>>>>>>>>> DELETED routine', routine);
     return routine;
   } catch (error) {
     console.error(error);

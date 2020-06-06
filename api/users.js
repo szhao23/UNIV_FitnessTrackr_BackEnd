@@ -57,7 +57,6 @@ router.post('/register', async (req, res, next) => {
         if (err) {
           next(err);
         } else {
-          console.log('>>>>>>>>> user', user);
 
           res.send({user});
         }
@@ -71,7 +70,6 @@ router.post('/register', async (req, res, next) => {
 // GET /api/users/:username/routines
 router.get('/:username/routines', async (req, res, next) => {
   try {
-    console.log('>>>>>>>>> req.params.username', req.params.username);
     const routines = await getPublicRoutinesByUser({username: req.params.username});
     res.send(routines);
   } catch (error) {
