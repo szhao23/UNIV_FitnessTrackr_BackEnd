@@ -180,6 +180,13 @@ describe('Database', () => {
         expect(routineToCreateAndUpdate.name).toBe(queriedRoutine.name);
         expect(routineToCreateAndUpdate.goal).toBe(queriedRoutine.goal);
       })
+      it('Does not update fields that are not passed in', async () => {
+        const name = 'Abs Day';
+        routineToCreateAndUpdate = await updateRoutine({id: routineToCreateAndUpdate.id, name, goal: 'Do all workouts that work those arms!'});
+        expect(routineToCreateAndUpdate.public).toBe(queriedRoutine.public);
+        expect(routineToCreateAndUpdate.name).toBe(name);
+        expect(routineToCreateAndUpdate.goal).toBe(queriedRoutine.goal);
+      })
       
     })
     describe('destroyRoutine', () => {

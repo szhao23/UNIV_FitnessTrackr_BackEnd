@@ -15,7 +15,7 @@ Start Server
     npm run start:dev
 
 ## Automated Tests
-Currently, test suites must be run separately.  I have not spent the time to debug why.
+Currently, test suites must be run separately.  I have not yet fixed this.
 
 ### DB Methods
 

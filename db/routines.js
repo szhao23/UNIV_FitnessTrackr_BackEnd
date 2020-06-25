@@ -1,6 +1,7 @@
 const client = require('./client')
 const { getActivitiesByRoutineId } = require('./activities')
 const { getUserByUsername } = require('./users')
+const util = require('./util');
 
 async function getRoutineById(id){
   try {
@@ -118,16 +119,17 @@ async function createRoutine({creatorId, public: isPublic, name, goal}) {
   }
 }
 
-async function updateRoutine({id, public: isPublic, name, goal}) {
+async function updateRoutine({id, ...fields}) {
   try {
-    const {rows: [routine]} = await client.query(`
-        UPDATE routines 
-        SET "public" = $2, "name" = $3, "goal" = $4
-        WHERE id = $1
-        RETURNING *;
-    `, [id, isPublic, name, goal]);
-
-    return routine;
+    if (util.dbFields(fields).insert.length > 0) {
+      const {rows: [routine]} = await client.query(`
+          UPDATE routines 
+          SET ${ util.dbFields(fields).insert }
+          WHERE id=${ id }
+          RETURNING *;
+      `, Object.values(fields));
+      return routine;
+    }
   } catch (error) {
     console.error(error);
   }
