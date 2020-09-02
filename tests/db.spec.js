@@ -81,8 +81,11 @@ describe('Database', () => {
       })
     })
     describe('getAllRoutines', () => {
+      let routine;
+      beforeAll(async() => {
+        [routine] = await getAllRoutines();
+      })
       it('selects and returns an array of all routines, includes their activities', async () => {
-        const [routine] = await getAllRoutines();
         expect(routine).toEqual(expect.objectContaining({
           id: expect.any(Number),
           creatorId: expect.any(Number),
@@ -90,12 +93,22 @@ describe('Database', () => {
           name: expect.any(String),
           goal: expect.any(String),
           activities: expect.any(Array),
+        }));
+      })
+      it('includes duration and count on activities, from routine_activities join', async () => {
+        const {activities: [firstActivity]} = routine;
+        expect(firstActivity).toEqual(expect.objectContaining({
+          duration: expect.any(Number),
+          count: expect.any(Number),
         }));
       })
     })
     describe('getAllPublicRoutines', () => {
+      let routine;
+      beforeAll(async() => {
+        [routine] = await getAllPublicRoutines();
+      })
       it('selects and returns an array of all public routines, includes their activities', async () => {
-        const [routine] = await getAllPublicRoutines();
         expect(routine).toEqual(expect.objectContaining({
           id: expect.any(Number),
           creatorId: expect.any(Number),
@@ -105,12 +118,22 @@ describe('Database', () => {
           activities: expect.any(Array),
         }));
         expect(routine.public).toBe(true);
+      })
+      it('includes duration and count on activities, from routine_activities join', async () => {
+        const {activities: [firstActivity]} = routine;
+        expect(firstActivity).toEqual(expect.objectContaining({
+          duration: expect.any(Number),
+          count: expect.any(Number),
+        }));
       })
     })
     describe('getAllRoutinesByUser', () => {
+      let routine, user;
+      beforeAll(async() => {
+        user = await getUserById(1); 
+        [routine] = await getAllRoutinesByUser(user);
+      })
       it('selects and return an array of all routines made by user, includes their activities', async () => {
-        const user = await getUserById(1); 
-        const [routine] = await getAllRoutinesByUser(user);
         expect(routine).toEqual(expect.objectContaining({
           id: expect.any(Number),
           creatorId: expect.any(Number),
@@ -120,12 +143,22 @@ describe('Database', () => {
           activities: expect.any(Array),
         }));
         expect(routine.creatorId).toBe(user.id);
+      })
+      it('includes duration and count on activities, from routine_activities join', async () => {
+        const {activities: [firstActivity]} = routine;
+        expect(firstActivity).toEqual(expect.objectContaining({
+          duration: expect.any(Number),
+          count: expect.any(Number),
+        }));
       })
     })
     describe('getPublicRoutinesByUser', () => {
+      let routine, user;
+      beforeAll(async() => {
+        user = await getUserById(1); 
+        [routine] = await getPublicRoutinesByUser(user);
+      })
       it('selects and returns an array of all routines made by user, includes their activities', async () => {
-        const user = await getUserById(2); 
-        const [routine] = await getPublicRoutinesByUser(user);
         expect(routine).toEqual(expect.objectContaining({
           id: expect.any(Number),
           creatorId: expect.any(Number),
@@ -137,11 +170,21 @@ describe('Database', () => {
         expect(routine.creatorId).toBe(user.id);
         expect(routine.public).toBe(true);
       })
+      it('includes duration and count on activities, from routine_activities join', async () => {
+        const {activities: [firstActivity]} = routine;
+        expect(firstActivity).toEqual(expect.objectContaining({
+          duration: expect.any(Number),
+          count: expect.any(Number),
+        }));
+      })
     })
     describe('getPublicRoutinesByActivity', () => {
+      let routine, activity;
+      beforeAll(async() => {
+        activity = await getActivityById(3); 
+        [routine] = await getPublicRoutinesByActivity(activity);
+      })
       it('selects and return an array of public routines which have a specific activityId in their routine_activities join, includes their activities', async () => {
-        const activity = await getActivityById(3); 
-        const [routine] = await getPublicRoutinesByActivity(activity);
         expect(routine).toEqual(expect.objectContaining({
           id: expect.any(Number),
           creatorId: expect.any(Number),
@@ -150,8 +193,14 @@ describe('Database', () => {
           goal: expect.any(String),
           activities: expect.any(Array),
         }));
-        // expect(routine.creatorId).toBe(activity.id);
         expect(routine.public).toBe(true);
+      })
+      it('includes duration and count on activities, from routine_activities join', async () => {
+        const {activities: [firstActivity]} = routine;
+        expect(firstActivity).toEqual(expect.objectContaining({
+          duration: expect.any(Number),
+          count: expect.any(Number),
+        }));
       })
     })
     describe('createRoutine', () => {
