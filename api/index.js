@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { getUserById } = require('../db');
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET } = process.env || 'neverTell';
 
 router.get('/health', (req, res, next) => {
   res.send({message: 'healthy'})

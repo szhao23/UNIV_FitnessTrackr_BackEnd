@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { createUser, getUserByUsername, getPublicRoutinesByUser, getUser } = require('../db');
 const SALT_COUNT = 10;
+const { JWT_SECRET } = process.env || 'neverTell';
 
 // POST /api/users/login
 router.post('/login', async (req, res, next) => {
@@ -25,9 +26,9 @@ router.post('/login', async (req, res, next) => {
         message: 'Username or password is incorrect',
       })
     } else {
-      const token = jwt.sign({id: user.id, username: user.username}, process.env.JWT_SECRET, { expiresIn: '1w' });
-        res.send({ message: "you're logged in!", token });
-    };
+      const token = jwt.sign({id: user.id, username: user.username}, JWT_SECRET, { expiresIn: '1w' });
+      res.send({ message: "you're logged in!", token });
+    }
   } catch (error) {
     console.log(error);
     next(error);

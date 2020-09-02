@@ -1,7 +1,5 @@
-const axios = require('axios');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const {API_URL} = process.env;
 const SALT_COUNT = 10;
 
 const { rebuildDB, testDB } = require('../db/seedData');
