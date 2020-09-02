@@ -28,8 +28,9 @@ async function getRoutinesWithoutActivities(){
 async function getAllRoutines() {
   try {
     const { rows: routines } = await client.query(`
-    SELECT *
-    FROM routines 
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id 
     `);
     for (let routine of routines) {
       routine.activities = await getActivitiesByRoutineId(routine.id);
@@ -43,8 +44,9 @@ async function getAllRoutinesByUser({username}) {
   try {
     const user = await getUserByUsername(username);
     const { rows: routines } = await client.query(`
-    SELECT *
-    FROM routines 
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id 
     WHERE "creatorId" = $1
     `, [user.id]);
     for (let routine of routines) {
@@ -59,8 +61,9 @@ async function getPublicRoutinesByUser({username}) {
   try {
     const user = await getUserByUsername(username);
     const { rows: routines } = await client.query(`
-    SELECT *
-    FROM routines 
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id 
     WHERE "creatorId" = $1
     AND public = true
     `, [user.id]);
@@ -75,8 +78,9 @@ async function getPublicRoutinesByUser({username}) {
 async function getAllPublicRoutines() {
   try {
     const { rows: routines } = await client.query(`
-    SELECT *
-    FROM routines 
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id
     WHERE public = true
     `);
     for (let routine of routines) {
@@ -90,8 +94,9 @@ async function getAllPublicRoutines() {
 async function getPublicRoutinesByActivity({id}) {
   try {
     const { rows: routines } = await client.query(`
-    SELECT routines.*
-    FROM routines 
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id
     JOIN routine_activities ON routine_activities."routineId" = routines.id
     WHERE routines.public = true
     AND routine_activities."activityId" = $1;

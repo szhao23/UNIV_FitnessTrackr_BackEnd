@@ -95,6 +95,11 @@ describe('Database', () => {
           activities: expect.any(Array),
         }));
       })
+      it('includes username, from users join, aliased as creatorName', async () => {
+        expect(routine).toEqual(expect.objectContaining({
+          creatorName: expect.any(String),
+        }));
+      })
       it('includes duration and count on activities, from routine_activities join', async () => {
         const {activities: [firstActivity]} = routine;
         expect(firstActivity).toEqual(expect.objectContaining({
@@ -118,6 +123,11 @@ describe('Database', () => {
           activities: expect.any(Array),
         }));
         expect(routine.public).toBe(true);
+      })
+      it('includes username, from users join, aliased as creatorName', async () => {
+        expect(routine).toEqual(expect.objectContaining({
+          creatorName: expect.any(String),
+        }));
       })
       it('includes duration and count on activities, from routine_activities join', async () => {
         const {activities: [firstActivity]} = routine;
@@ -143,6 +153,11 @@ describe('Database', () => {
           activities: expect.any(Array),
         }));
         expect(routine.creatorId).toBe(user.id);
+      })
+      it('includes username, from users join, aliased as creatorName', async () => {
+        expect(routine).toEqual(expect.objectContaining({
+          creatorName: expect.any(String),
+        }));
       })
       it('includes duration and count on activities, from routine_activities join', async () => {
         const {activities: [firstActivity]} = routine;
@@ -170,6 +185,11 @@ describe('Database', () => {
         expect(routine.creatorId).toBe(user.id);
         expect(routine.public).toBe(true);
       })
+      it('includes username, from users join, aliased as creatorName', async () => {
+        expect(routine).toEqual(expect.objectContaining({
+          creatorName: expect.any(String),
+        }));
+      })
       it('includes duration and count on activities, from routine_activities join', async () => {
         const {activities: [firstActivity]} = routine;
         expect(firstActivity).toEqual(expect.objectContaining({
@@ -194,6 +214,11 @@ describe('Database', () => {
           activities: expect.any(Array),
         }));
         expect(routine.public).toBe(true);
+      })
+      it('includes username, from users join, aliased as creatorName', async () => {
+        expect(routine).toEqual(expect.objectContaining({
+          creatorName: expect.any(String),
+        }));
       })
       it('includes duration and count on activities, from routine_activities join', async () => {
         const {activities: [firstActivity]} = routine;
