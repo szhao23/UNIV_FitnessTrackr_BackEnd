@@ -2,8 +2,8 @@ const axios = require('axios');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {API_URL, JWT_SECRET} = process.env;
-const SALT_COUNT = 10;
+const { API_URL } = process.env || 'http://localhost:3000';
+const { JWT_SECRET } = process.env || 'neverTell';
 
 const { rebuildDB } = require('../db/seedData');
 const { getUserById, createActivity, getPublicRoutinesByUser, getPublicRoutinesByActivity, getAllPublicRoutines, getRoutineById, createRoutine, getRoutineActivityById } = require('../db');
