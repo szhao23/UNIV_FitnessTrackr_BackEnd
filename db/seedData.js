@@ -74,7 +74,7 @@ async function createInitialUsers() {
       { username: 'glamgal', password: 'glamgal123' },
     ]
     const users = await Promise.all(usersToCreate.map(async user => {
-      const hashedPassword = bcrypt.hashSync(user.username, SALT_COUNT);
+      const hashedPassword = bcrypt.hashSync(user.password, SALT_COUNT); // TODO - fix this! should be password, not username
       const createdUser = await createUser({
         username: user.username,
         password: hashedPassword // not the plaintext

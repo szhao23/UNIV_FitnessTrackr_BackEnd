@@ -9,7 +9,7 @@
     "start:dev": "nodemon index.js",
     "start": "node index.js",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll --runInBand"
   },
   "repository": {
     "type": "git",
