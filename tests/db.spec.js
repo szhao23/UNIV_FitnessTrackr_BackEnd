@@ -1,8 +1,13 @@
+/* 
+
+DO NOT CHANGE THIS FILE
+
+*/
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 const SALT_COUNT = 10;
 
-const { rebuildDB, testDB } = require('../db/seedData');
+const { rebuildDB } = require('../db/seedData');
 const { getUserById, getAllActivities, getActivityById, createActivity, updateActivity, getRoutineById, getAllRoutines, getAllPublicRoutines, getAllRoutinesByUser, getPublicRoutinesByUser, getPublicRoutinesByActivity, createRoutine, updateRoutine, destroyRoutine, createUser, getUser, getRoutineActivitiesByRoutine, addActivityToRoutine, updateRoutineActivity, destroyRoutineActivity } = require('../db');
 const client = require('../db/client');
 
@@ -11,29 +16,42 @@ describe('Database', () => {
     await rebuildDB();
   })
   describe('Users', () => {
-    let userToCreateAndUpdate;
+    let userToCreateAndUpdate, queriedUser;
     let userCredentials = {username: 'billybob', password: 'bobbybadboy'};
     describe('createUser({ username, password })', () => {
-      it('Hash the password before storing it to the database', async () => {
-        const hashedPassword = bcrypt.hashSync(userCredentials.password, SALT_COUNT);
-        userToCreateAndUpdate = await createUser({
-          username: userCredentials.username,
-          password: hashedPassword // not the plaintext
-        });
-        const {rows: [queriedUser]} = await client.query(`SELECT * FROM users WHERE username = $1`, [userCredentials.username])
+      beforeAll(async () => {
+        userToCreateAndUpdate = await createUser(userCredentials);
+        const {rows} = await client.query(`SELECT * FROM users WHERE username = $1`, [userCredentials.username]);
+        queriedUser = rows[0];
+      })
+      it('Creates the user', async () => {
         expect(userToCreateAndUpdate.username).toBe(userCredentials.username);
         expect(queriedUser.username).toBe(userCredentials.username);
+      });
+      it('EXTRA CREDIT: Does not store plaintext password in the database', async () => {
         expect(queriedUser.password).not.toBe(userCredentials.password);
+      });
+      it('EXTRA CREDIT: Hashes the password (salted 10 times) before storing it to the database', async () => {
+        const hashedVersion = bcrypt.compareSync(userCredentials.password, queriedUser.password);
+        expect(hashedVersion).toBe(true);
+      });
+      it('Does NOT return the password', async () => {
+        expect(userToCreateAndUpdate.password).toBeFalsy();
       })
     })
     describe('getUser({ username, password })', () => {
-      it('Verifies the password against the hashed password', async () => {
-        const verifiedUser = await getUser(userCredentials);
+      let verifiedUser;
+      beforeAll(async () => {
+        verifiedUser = await getUser(userCredentials);
+      })
+      it('Verifies the passed-in, plain-text password against the password in the database (the hashed password, if this portion is complete)', async () => {
         const unVerifiedUser = await getUser({username: userCredentials.username, password: 'badPassword'});
         expect(verifiedUser).toBeTruthy();
         expect(verifiedUser.username).toBe(userCredentials.username);
-        expect(verifiedUser.password).toBeFalsy;
         expect(unVerifiedUser).toBeFalsy();
+      })
+      it('Does NOT return the password', async () => {
+        expect(verifiedUser.password).toBeFalsy();
       })
     })
     describe('getUserById', () => {
@@ -67,7 +85,6 @@ describe('Database', () => {
         const [activityToUpdate] = await getAllActivities();
         activityToUpdate.name = 'standing barbell curl';
         const activity = await updateActivity(activityToUpdate);
-        delete activity.id;
         expect(activity).toEqual(activityToUpdate);
       })
     })

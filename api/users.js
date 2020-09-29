@@ -50,18 +50,18 @@ router.post('/register', async (req, res, next) => {
         message: 'Password Too Short!'
       });
     } else {
-      bcrypt.hash(password, SALT_COUNT, async function(err, hashedPassword) {
-        const user = await createUser({
-          username,
-          password: hashedPassword // not the plaintext
-        });
-        if (err) {
-          next(err);
-        } else {
-
-          res.send({user});
-        }
+      const user = await createUser({
+        username,
+        password
       });
+      if (!user) {
+        next({
+          name: 'UserCreationError',
+          message: 'There was a problem registering you. Please try again.',
+        });
+      } else {
+        res.send({user});
+      }
     }
   } catch (error) {
     next(error)
