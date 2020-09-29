@@ -52,6 +52,7 @@ async function createActivity({ name, description }){
 async function updateActivity(fields = {}){
   const { id } = fields;
   const toUpdate = Object.assign({}, fields);
+  delete toUpdate.id;
   let activity;
   try {
     if (util.dbFields(toUpdate).insert.length > 0) {
