@@ -51,16 +51,17 @@ async function createActivity({ name, description }){
 // return the new activity
 async function updateActivity(fields = {}){
   const { id } = fields;
-  delete fields.id;
+  const toUpdate = Object.assign({}, fields);
+  delete toUpdate.id;
   let activity;
   try {
-    if (util.dbFields(fields).insert.length > 0) {
+    if (util.dbFields(toUpdate).insert.length > 0) {
       const {rows} = await client.query(`
         UPDATE activities
-        SET ${ util.dbFields(fields).insert }
+        SET ${ util.dbFields(toUpdate).insert }
         WHERE id=${ id }
         RETURNING *;
-      `, Object.values(fields));
+      `, Object.values(toUpdate));
       activity = rows[0];
     }
   } catch (error) {
