@@ -11,5 +11,5 @@ SELECT *
 FROM routines
 JOIN routine_activities ON routines.id=routine_activities."routineId"
 JOIN activities ON activities.id=routine_activities."activityId"
-WHERE routines.public=true
+WHERE routines.isPublic=true
 AND routine_activities."activityId"=$1;

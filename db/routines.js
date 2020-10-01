@@ -65,7 +65,7 @@ async function getPublicRoutinesByUser({username}) {
     FROM routines
     JOIN users ON routines."creatorId" = users.id 
     WHERE "creatorId" = $1
-    AND public = true
+    AND "isPublic" = true
     `, [user.id]);
     for (let routine of routines) {
       routine.activities = await getActivitiesByRoutineId(routine.id);
@@ -81,7 +81,7 @@ async function getAllPublicRoutines() {
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
     JOIN users ON routines."creatorId" = users.id
-    WHERE public = true
+    WHERE "isPublic" = true
     `);
     for (let routine of routines) {
       routine.activities = await getActivitiesByRoutineId(routine.id);
@@ -98,7 +98,7 @@ async function getPublicRoutinesByActivity({id}) {
     FROM routines
     JOIN users ON routines."creatorId" = users.id
     JOIN routine_activities ON routine_activities."routineId" = routines.id
-    WHERE routines.public = true
+    WHERE routines."isPublic" = true
     AND routine_activities."activityId" = $1;
   `, [id]);
     for (let routine of routines) {
@@ -110,10 +110,10 @@ async function getPublicRoutinesByActivity({id}) {
   }
 }
 
-async function createRoutine({creatorId, public: isPublic, name, goal}) {
+async function createRoutine({creatorId, isPublic, name, goal}) {
   try {
     const {rows: [routine]} = await client.query(`
-        INSERT INTO routines ("creatorId", "public", "name", "goal")
+        INSERT INTO routines ("creatorId", "isPublic", "name", "goal")
         VALUES($1, $2, $3, $4)
         RETURNING *;
     `, [creatorId, isPublic, name, goal]);

@@ -1,12 +1,13 @@
+// require in the database adapter functions as you write them (createUser, createActivity...)
 const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, getAllRoutines, createRoutine, addActivityToRoutine } = require('./');
 const client = require('./client');
 const bcrypt = require('bcrypt');
 const SALT_COUNT = 10;
 
-const faker = require('faker');
 
 async function dropTables() {
   console.log('Dropping All Tables...');
+  // drop all tables, in the correct order
   try {
       await  client.query(`
       DROP TABLE IF EXISTS routine_activities;
@@ -22,6 +23,7 @@ async function dropTables() {
 async function createTables() {
   try {
     console.log("Starting to build tables...");
+    // create all tables, in the correct order
 
     await  client.query(`
       CREATE TABLE users(
@@ -42,7 +44,7 @@ async function createTables() {
       CREATE TABLE routines(
         id SERIAL PRIMARY KEY, 
         "creatorId" INTEGER REFERENCES users(id),
-        public BOOLEAN DEFAULT false,
+        "isPublic" BOOLEAN DEFAULT false,
         name VARCHAR(255) UNIQUE NOT NULL,
         goal TEXT NOT NULL
       );
@@ -64,9 +66,15 @@ async function createTables() {
   }
 }
 
+/* 
+
+DO NOT CHANGE ANYTHING BELOW. This is default seed data, and will help you start testing, before getting to the tests. 
+
+*/
+
 async function createInitialUsers() {
+  console.log('Starting to create users...');
   try {
-    console.log('Starting to create users...');
 
     const usersToCreate = [
       { username: 'albert', password: 'bertie99' },
@@ -114,10 +122,10 @@ async function createInitialRoutines() {
     console.log('starting to create routines...');
 
     const routinesToCreate = [
-      {creatorId: 2, public: false, name: 'Bicep Day', goal: 'Work the Back and Biceps.'},
-      {creatorId: 1, public: true, name: 'Chest Day', goal: 'To beef up the Chest and Triceps!'},
-      {creatorId: 1, public: false, name: 'Leg Day', goal: 'Running, stairs, squats'},
-      {creatorId: 2, public: true, name: 'Cardio Day', goal: 'Running, stairs. Stuff that gets your heart pumping!'},
+      {creatorId: 2, isPublic: false, name: 'Bicep Day', goal: 'Work the Back and Biceps.'},
+      {creatorId: 1, isPublic: true, name: 'Chest Day', goal: 'To beef up the Chest and Triceps!'},
+      {creatorId: 1, isPublic: false, name: 'Leg Day', goal: 'Running, stairs, squats'},
+      {creatorId: 2, isPublic: true, name: 'Cardio Day', goal: 'Running, stairs. Stuff that gets your heart pumping!'},
     ]
     const routines = await Promise.all(routinesToCreate.map(routine => createRoutine(routine)));
     console.log('Routines Created: ', routines)
@@ -212,17 +220,6 @@ async function rebuildDB() {
   }
 }
 
-const testDB = async () => {
-  try {
-    console.log('Running testDB');
-
-    console.log('Finished DB Tests');
-  } catch (error) {
-    throw new Error('Error Testing Database: ', error)
-  }
-}
-
 module.exports = {
-  rebuildDB,
-  testDB
+  rebuildDB
 };
