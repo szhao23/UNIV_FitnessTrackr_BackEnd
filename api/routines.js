@@ -19,7 +19,7 @@ router.get('/', async (req, res, next) => {
 router.post('/', requireUser, async (req, res, next) => {
   try {
     const {name, goal} = req.body;
-    const createdRoutine = await createRoutine({creatorId: req.user.id, name, goal, public: req.body.public});
+    const createdRoutine = await createRoutine({creatorId: req.user.id, name, goal, isPublic: req.body.isPublic});
     res.send(createdRoutine)
   } catch (error) {
     next(error);
