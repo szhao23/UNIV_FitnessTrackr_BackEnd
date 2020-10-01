@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { createUser, getUserByUsername, getPublicRoutinesByUser, getUser } = require('../db');
+const { requireUser } = require('./utils');
 const SALT_COUNT = 10;
 const { JWT_SECRET } = process.env || 'neverTell';
 
@@ -34,6 +35,7 @@ router.post('/login', async (req, res, next) => {
     next(error);
   }
 });
+
 // POST /api/users/register
 router.post('/register', async (req, res, next) => {
   try {
@@ -63,6 +65,15 @@ router.post('/register', async (req, res, next) => {
         res.send({user});
       }
     }
+  } catch (error) {
+    next(error)
+  }
+})
+
+// GET /api/users/me
+router.get('/me', requireUser, async (req, res, next) => {
+  try {
+    res.send(req.user);
   } catch (error) {
     next(error)
   }
