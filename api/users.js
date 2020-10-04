@@ -27,7 +27,7 @@ router.post('/login', async (req, res, next) => {
       })
     } else {
       const token = jwt.sign({id: user.id, username: user.username}, JWT_SECRET, { expiresIn: '1w' });
-      res.send({ message: "you're logged in!", token });
+      res.send({ user, message: "you're logged in!", token });
     }
   } catch (error) {
     console.log(error);
@@ -61,7 +61,8 @@ router.post('/register', async (req, res, next) => {
           message: 'There was a problem registering you. Please try again.',
         });
       } else {
-        res.send({user});
+        const token = jwt.sign({id: user.id, username: user.username}, JWT_SECRET, { expiresIn: '1w' });
+        res.send({ user, message: "you're signed up!", token });
       }
     }
   } catch (error) {
