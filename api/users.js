@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const { createUser, getUserByUsername, getPublicRoutinesByUser, getUser } = require('../db');
 const { requireUser } = require('./utils');
 const SALT_COUNT = 10;
