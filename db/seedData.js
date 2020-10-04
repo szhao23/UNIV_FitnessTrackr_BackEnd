@@ -1,22 +1,19 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
-const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, getAllRoutines, createRoutine, addActivityToRoutine } = require('./');
+const { createUser, getAllActivities, createActivity, getRoutinesWithoutActivities, createRoutine, addActivityToRoutine } = require('./');
 const client = require('./client');
-const bcrypt = require('bcrypt');
-const SALT_COUNT = 10;
-
 
 async function dropTables() {
   console.log('Dropping All Tables...');
   // drop all tables, in the correct order
   try {
-      await  client.query(`
-      DROP TABLE IF EXISTS routine_activities;
-      DROP TABLE IF EXISTS routines;
-      DROP TABLE IF EXISTS activities;
-      DROP TABLE IF EXISTS users;
+    await  client.query(`
+    DROP TABLE IF EXISTS routine_activities;
+    DROP TABLE IF EXISTS routines;
+    DROP TABLE IF EXISTS activities;
+    DROP TABLE IF EXISTS users;
   `)
   } catch (error) {
-      throw error; 
+    throw error; 
   }
 }
 
@@ -131,7 +128,7 @@ async function createInitialRoutines() {
     console.log('Routines Created: ', routines)
     console.log('Finished creating routines.')
   } catch (error) {
-      throw error;
+    throw error;
   }
 }
 
@@ -201,7 +198,7 @@ async function createInitialRoutineActivities() {
     console.log('routine_activities created: ', routineActivities)
     console.log('Finished creating routine_activities!')
   } catch (error) {
-      throw error;
+    throw error;
   }
 }
 
