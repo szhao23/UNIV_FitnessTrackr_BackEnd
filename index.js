@@ -19,8 +19,16 @@ server.use(morgan('dev'));
 server.use(express.json());
 server.use(express.urlencoded({extended: true}));
 
+// Serve Docs
+const path = require('path');
+server.use('/docs', express.static(path.join(__dirname, 'public')));
+
 // Router: /api
 server.use('/api', require('./api'));
+
+server.get('/', (req, res) => {
+  res.redirect('/docs');
+})
 
 // error handling middleware
 server.use((error, req, res, next) => {
