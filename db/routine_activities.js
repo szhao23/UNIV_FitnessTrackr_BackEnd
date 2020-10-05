@@ -1,4 +1,5 @@
 const client = require('./client');
+const util = require('./util');
 
 async function getRoutineActivityById(id){
   try {
@@ -13,23 +14,23 @@ async function getRoutineActivityById(id){
 }
 
 async function addActivityToRoutine({
-    routineId,
-    activityId,
-    count,
-    duration,
-  }) {
-    try {
-      const { rows: [routineActivity] } = await client.query(`
-      INSERT INTO routine_activities ( "routineId", "activityId", count , duration)
-      VALUES($1, $2, $3, $4)
-      ON CONFLICT ("routineId", "activityId") DO NOTHING
-      RETURNING *;
-        `, [ routineId, activityId, count, duration]);
-      return routineActivity;
-    } catch (error) {
-      throw error;
-    }
+  routineId,
+  activityId,
+  count,
+  duration,
+}) {
+  try {
+    const { rows: [routineActivity] } = await client.query(`
+    INSERT INTO routine_activities ( "routineId", "activityId", count , duration)
+    VALUES($1, $2, $3, $4)
+    ON CONFLICT ("routineId", "activityId") DO NOTHING
+    RETURNING *;
+      `, [ routineId, activityId, count, duration]);
+    return routineActivity;
+  } catch (error) {
+    throw error;
   }
+}
 
 async function getAllRoutineActivities() {
   try {
@@ -54,15 +55,44 @@ async function getRoutineActivitiesByRoutine({id}) {
   }
 }
 
-async function updateRoutineActivity ({ id, count, duration }) {
+async function updateRoutine({id, ...fields}) {
   try {
-    const {rows: [routineActivity]} = await client.query(`
+    const toUpdate = {}
+    for(let column in fields) {
+      if(fields[column] !== undefined) toUpdate[column] = fields[column];
+    }
+    let routine;
+    if (util.dbFields(fields).insert.length > 0) {
+      const {rows} = await client.query(`
+          UPDATE routines 
+          SET ${ util.dbFields(toUpdate).insert }
+          WHERE id=${ id }
+          RETURNING *;
+      `, Object.values(toUpdate));
+      routine = rows[0];
+      return routine;
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+async function updateRoutineActivity ({id, ...fields}) {
+  try {
+    const toUpdate = {}
+    for(let column in fields) {
+      if(fields[column] !== undefined) toUpdate[column] = fields[column];
+    }
+    let routineActivity;
+    if (util.dbFields(fields).insert.length > 0) {
+      const {rows} = await client.query(`
         UPDATE routine_activities
-        SET "count" = $2, "duration" = $3
-        WHERE id = $1
+        SET ${ util.dbFields(toUpdate).insert }
+        WHERE id = ${ id }
         RETURNING *;
-    `, [id, count, duration]);
-    return routineActivity;
+      `, Object.values(toUpdate));
+      routineActivity = rows[0];
+      return routineActivity;
+    }
   } catch (error) {
     throw error;
   }

@@ -82,8 +82,17 @@ router.get('/me', requireUser, async (req, res, next) => {
 // GET /api/users/:username/routines
 router.get('/:username/routines', async (req, res, next) => {
   try {
-    const routines = await getPublicRoutinesByUser({username: req.params.username});
-    res.send(routines);
+    const {username} = req.params;
+    const user = await getUserByUsername(username);
+    if(!user) {
+      next({
+        name: 'NoUser',
+        message: `Error looking up user ${username}`
+      });
+    } else {
+      const routines = await getPublicRoutinesByUser({username: username});
+      res.send(routines);
+    }
   } catch (error) {
     next(error)
   }

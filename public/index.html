@@ -27,6 +27,7 @@
 <p>It is <strong>crucial</strong> that the value for <code>Authorization</code> is a string starting with <code>Bearer</code>, followed by a space, and finished with the <code>token</code> you receive either by registering or logging in. Deviating from this format will cause the API to not recognize the token, and will result in an error.</p>
 <p>If the token is malformed, missing, or has been revoked, you will get a response specific to that.</p>
 <pre class="hljs language-js"><code>{
+  <span class="hljs-string">&quot;error&quot;</span>: <span class="hljs-string">&quot;You must be logged in to perform this action&quot;</span>,
   <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;MissingUserError&quot;</span>,
   <span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;You must be logged in to perform this action&quot;</span>
 }
@@ -34,15 +35,16 @@
 <h3>General Return Schema</h3>
 <p>ERROR</p>
 <pre class="hljs language-js"><code>{
-  <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;MissingUserError&quot;</span>,
-  <span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;You must be logged in to perform this action&quot;</span>
+  <span class="hljs-string">&quot;error&quot;</span>: <span class="hljs-string">&quot;No activity by ID 10&quot;</span>,
+  <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;NotFound&quot;</span>,
+  <span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;No activity by ID 10&quot;</span>
 }
 </code></pre>
 <p>SUCCESS (sends back created/updated entity)</p>
 <pre class="hljs language-js"><code>{
-    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">9</span>,
-    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;bench press 4&quot;</span>,
-    <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;4 sets of 10. Lift a safe amount, but push yourself!&quot;</span>
+  <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">9</span>,
+  <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Biceps&quot;</span>,
+  <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Yep, it&#x27;s that day again!&quot;</span>
 }
 </code></pre>
 <h2>User Endpoints</h2>
@@ -99,7 +101,7 @@
 <ul>
 <li><code>user</code> (<code>object</code>)
 <ul>
-<li><code>id</code> (<code>string</code>): the database identifier of the user</li>
+<li><code>id</code> (<code>number</code>): the database identifier of the user</li>
 <li><code>username</code> (<code>string</code>): the username of the user</li>
 </ul>
 </li>
@@ -109,6 +111,10 @@
 <h4>Sample Call</h4>
 <pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/users/login&#x27;</span>, {
   <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+    <span class="hljs-string">&#x27;Authorization&#x27;</span>: <span class="hljs-string">&#x27;Bearer TOKEN_STRING_HERE&#x27;</span>
+  },
   <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
     <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;superman27&#x27;</span>,
     <span class="hljs-attr">password</span>: <span class="hljs-string">&#x27;krypt0n0rbust&#x27;</span>
@@ -136,7 +142,7 @@
 <p>No request parameters are necessary for this route.</p>
 <h4>Return Parameters</h4>
 <ul>
-<li><code>id</code> (<code>string</code>): the database identifier of the user</li>
+<li><code>id</code> (<code>number</code>): the database identifier of the user</li>
 <li><code>username</code> (<code>string</code>): the username of the user</li>
 </ul>
 <h4>Sample Call</h4>
@@ -158,32 +164,582 @@
 }
 </code></pre>
 <h3><code>GET /users/:username/routines</code></h3>
-<p>Get a list of public routines for a particular user.</p>
+<p>This route returns a list of public routines for a particular user.</p>
+<h4>Request Parameters</h4>
+<p>There are no request parameters.</p>
+<h4>Return Parameters</h4>
+<p>(<code>array</code> of <code>object</code>):</p>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine</code> object.</li>
+<li><code>creatorId</code> (<code>number</code>): This is the database identifier for the <code>user</code> which created this <code>routine</code></li>
+<li><code>creatorName</code> (<code>string</code>): This is the username for the <code>user</code> which created this <code>routine</code></li>
+<li><code>isPublic</code> (<code>boolean</code>): Whether or not the routine should be visible to all users (will always be true for public routes)</li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the routine.</li>
+<li><code>goal</code> (<code>string</code>): This is like the description of the routine.</li>
+<li><code>routine</code> (<code>array</code> of <code>routine</code> objects): An array of activities associated with this routine.
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the activity.</li>
+<li><code>description</code> (<code>string</code>): This is the description of the activity.</li>
+<li><code>duration</code> (<code>number</code>): This is how long (in minutes) this activity should be performed for this routine.</li>
+<li><code>count</code> (<code>number</code>): This is the number of times (reps) this activity should be performed for this routine.</li>
+</ul>
+</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/users/albert/routines&#x27;</span>, {
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+  },
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<pre class="hljs language-js"><code>[
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">2</span>,
+        <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Chest Day&quot;</span>,
+        <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;To beef up the Chest and Triceps!&quot;</span>,
+        <span class="hljs-string">&quot;creatorName&quot;</span>: <span class="hljs-string">&quot;albert&quot;</span>,
+        <span class="hljs-string">&quot;activities&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">3</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;bench press&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;3 sets of 10. Lift a safe amount, but push yourself!&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">8</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            },
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">4</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Push Ups&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Pretty sure you know what to do!&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">7</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            }
+        ]
+    }
+]
+</code></pre>
 <h2>Activities Endpoints</h2>
 <h3><code>GET /activities</code></h3>
 <p>Just returns a list of all activities in the database</p>
+<h4>Request Parameters</h4>
+<p>There are no request parameters.</p>
+<h4>Return Parameters</h4>
+<p>(<code>array</code> of <code>object</code>):</p>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the activity.</li>
+<li><code>description</code> (<code>string</code>): This is the description of the activity.</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/activities&#x27;</span>, {
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+  },
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<pre class="hljs language-js"><code>[
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">2</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Incline Dumbbell Hammer Curl&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Lie down face up on an incline bench and lift thee barbells slowly upward toward chest&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">3</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;bench press&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Lift a safe amount, but push yourself!&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">4</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Push Ups&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Pretty sure you know what to do!&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">5</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;squats&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Heavy lifting.&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">6</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;treadmill&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;running&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">7</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;stairs&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;climb those stairs&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">8</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;elliptical&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;using the elliptical machine&quot;</span>
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;standing barbell curl&quot;</span>,
+        <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Lift that barbell!&quot;</span>
+    }
+]
+</code></pre>
 <h3><code>POST /activities</code> <code>(*)</code></h3>
-<p>Create a new activity</p>
+<p>A request to this endpoint will attempt to create a new activity. You must pass a valid token with this request, or it will be rejected.</p>
+<h4>Request Parameters</h4>
+<ul>
+<li><code>name</code> (<code>string</code>, required): the desired name for the new activity</li>
+<li><code>description</code> (<code>string</code>, required): the desired description for the new activity</li>
+</ul>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the activity.</li>
+<li><code>description</code> (<code>string</code>): This is the description of the activity.</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/activities&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+  <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Running&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Keep on running!&#x27;</span>
+  })
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<p>If the API creates a new activity, the following object will be returned:</p>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">9</span>,
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Running&quot;</span>,
+    <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Keep on running!&quot;</span>
+}
+</code></pre>
 <h3><code>PATCH /activities/:activityId</code> <code>(*)</code></h3>
 <p>Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)</p>
+<h4>Request Parameters</h4>
+<ul>
+<li><code>name</code> (<code>string</code>, optional): the desired new name for the activity</li>
+<li><code>description</code> (<code>string</code>, optional): the desired new description for the activity</li>
+</ul>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the activity.</li>
+<li><code>description</code> (<code>string</code>): This is the description of the activity.</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/activities/9&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;PATCH&quot;</span>,
+  <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Running&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;Keep on running, til you drop!&#x27;</span>
+  })
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<p>If the API successfully edits the activity, the following object will be returned:</p>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">9</span>,
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Running&quot;</span>,
+    <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Keep on running, til you drop!&quot;</span>
+}
+</code></pre>
 <h3><code>GET /activities/:activityId/routines</code></h3>
-<p>Get a list of all public routines which feature that activity</p>
+<p>This route returns a list of public routines which feature that activity</p>
+<h4>Request Parameters</h4>
+<p>There are no request parameters.</p>
+<h4>Return Parameters</h4>
+<p>(<code>array</code> of <code>object</code>):</p>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine</code> object.</li>
+<li><code>creatorId</code> (<code>number</code>): This is the database identifier for the <code>user</code> which created this <code>routine</code></li>
+<li><code>creatorName</code> (<code>string</code>): This is the username for the <code>user</code> which created this <code>routine</code></li>
+<li><code>isPublic</code> (<code>boolean</code>): Whether or not the routine should be visible to all users (will always be true for public routes)</li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the routine.</li>
+<li><code>goal</code> (<code>string</code>): This is like the description of the routine.</li>
+<li><code>routine</code> (<code>array</code> of <code>routine</code> objects): An array of activities associated with this routine.
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the activity.</li>
+<li><code>description</code> (<code>string</code>): This is the description of the activity.</li>
+<li><code>duration</code> (<code>number</code>): This is how long (in minutes) this activity should be performed for this routine.</li>
+<li><code>count</code> (<code>number</code>): This is the number of times (reps) this activity should be performed for this routine.</li>
+</ul>
+</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/activities/3/routines&#x27;</span>, {
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+  },
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<pre class="hljs language-js"><code>[
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">2</span>,
+        <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Chest Day&quot;</span>,
+        <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;To beef up the Chest and Triceps!&quot;</span>,
+        <span class="hljs-string">&quot;creatorName&quot;</span>: <span class="hljs-string">&quot;albert&quot;</span>,
+        <span class="hljs-string">&quot;activities&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">3</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;bench press&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Lift a safe amount, but push yourself!&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">8</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            },
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">4</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Push Ups&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Pretty sure you know what to do!&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">7</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            }
+        ]
+    }
+]
+</code></pre>
 <h2>Routines Endpoints</h2>
 <h3><code>GET /routines</code></h3>
-<p>Return a list of public routines, include the activities with them</p>
+<p>This route returns a list of all public routines</p>
+<h4>Request Parameters</h4>
+<p>There are no request parameters.</p>
+<h4>Return Parameters</h4>
+<p>(<code>array</code> of <code>object</code>):</p>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine</code> object.</li>
+<li><code>creatorId</code> (<code>number</code>): This is the database identifier for the <code>user</code> which created this <code>routine</code></li>
+<li><code>creatorName</code> (<code>string</code>): This is the username for the <code>user</code> which created this <code>routine</code></li>
+<li><code>isPublic</code> (<code>boolean</code>): Whether or not the routine should be visible to all users (will always be true for public routes)</li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the routine.</li>
+<li><code>goal</code> (<code>string</code>): This is like the description of the routine.</li>
+<li><code>routine</code> (<code>array</code> of <code>routine</code> objects): An array of activities associated with this routine.
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the activity.</li>
+<li><code>description</code> (<code>string</code>): This is the description of the activity.</li>
+<li><code>duration</code> (<code>number</code>): This is how long (in minutes) this activity should be performed for this routine.</li>
+<li><code>count</code> (<code>number</code>): This is the number of times (reps) this activity should be performed for this routine.</li>
+</ul>
+</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/routines&#x27;</span>, {
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+  },
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<pre class="hljs language-js"><code>[
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">2</span>,
+        <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">1</span>,
+        <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Chest Day&quot;</span>,
+        <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;To beef up the Chest and Triceps!&quot;</span>,
+        <span class="hljs-string">&quot;creatorName&quot;</span>: <span class="hljs-string">&quot;albert&quot;</span>,
+        <span class="hljs-string">&quot;activities&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">3</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;bench press&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Lift a safe amount, but push yourself!&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">8</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            },
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">4</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Push Ups&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;Pretty sure you know what to do!&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">7</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            }
+        ]
+    },
+    {
+        <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">4</span>,
+        <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">2</span>,
+        <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
+        <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Cardio Day&quot;</span>,
+        <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;Running, stairs. Stuff that gets your heart pumping!&quot;</span>,
+        <span class="hljs-string">&quot;creatorName&quot;</span>: <span class="hljs-string">&quot;sandra&quot;</span>,
+        <span class="hljs-string">&quot;activities&quot;</span>: [
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">6</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;treadmill&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;running&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">10</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            },
+            {
+                <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">7</span>,
+                <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;stairs&quot;</span>,
+                <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;climb those stairs&quot;</span>,
+                <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">15</span>,
+                <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">10</span>
+            }
+        ]
+    }
+]
+</code></pre>
 <h3><code>POST /routines</code> <code>(*)</code></h3>
-<p>Create a new routine</p>
+<p>A request to this endpoint will attempt to create a new routine. You must pass a valid token with this request, or it will be rejected.</p>
+<h4>Request Parameters</h4>
+<ul>
+<li><code>name</code> (<code>string</code>, required): the desired name for the new routine</li>
+<li><code>goal</code> (<code>string</code>, required): the desired goal description of the routine.</li>
+<li><code>isPublic</code> (<code>boolean</code>, optional): Whether or not the routine should be visible to all users. <code>null</code> by default</li>
+</ul>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the routine.</li>
+<li><code>goal</code> (<code>string</code>): This is like the description of the routine.</li>
+<li><code>creatorId</code> (<code>number</code>): This is the database identifier for the <code>user</code> which created this <code>routine</code></li>
+<li><code>isPublic</code> (<code>boolean</code>): Whether or not the routine should be visible to all users. <code>null</code> by default</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/routines&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+  <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Long Cardio Routine&#x27;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;A bunch of activities that will get your heart pumping!&#x27;</span>,
+    <span class="hljs-attr">isPublic</span>: <span class="hljs-literal">true</span>
+  })
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<p>If the API creates a new routine, the following object will be returned:</p>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">8</span>,
+    <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">2</span>,
+    <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Long Cardio Routine&quot;</span>,
+    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;A bunch of activities that will get your heart pumping!&quot;</span>
+}
+</code></pre>
 <h3><code>PATCH /routines/:routineId</code> <code>(**)</code></h3>
 <p>Update a routine, notably change public/private, the name, or the goal</p>
+<h4>Request Parameters</h4>
+<ul>
+<li><code>name</code> (<code>string</code>, optional): the desired new name for the routine</li>
+<li><code>goal</code> (<code>string</code>, optional): the desired new goal description of the routine.</li>
+<li><code>isPublic</code> (<code>boolean</code>, optional): Whether or not the routine should be visible to all users. <code>null</code> by default</li>
+</ul>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the routine.</li>
+<li><code>goal</code> (<code>string</code>): This is like the description of the routine.</li>
+<li><code>creatorId</code> (<code>number</code>): This is the database identifier for the <code>user</code> which created this <code>routine</code></li>
+<li><code>isPublic</code> (<code>boolean</code>): Whether or not the routine should be visible to all users. <code>null</code> by default</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/routines/6&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;PATCH&quot;</span>,
+  <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Long Cardio Day&#x27;</span>,
+    <span class="hljs-attr">goal</span>: <span class="hljs-string">&#x27;A bunch of activities that will get your heart pumping!&#x27;</span>
+  })
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<p>If the API successfully edits the routine, the following object will be returned:</p>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">6</span>,
+    <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">2</span>,
+    <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Long Cardio Day&quot;</span>,
+    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;A bunch of activities that will get your heart pumping!&quot;</span>
+}
+</code></pre>
 <h3><code>DELETE /routines/:routineId</code> <code>(**)</code></h3>
 <p>Hard delete a routine. Make sure to delete all the <code>routineActivities</code> whose routine is the one being deleted.</p>
+<p>This endpoint will hard delete a routine whose <code>id</code> is equal to <code>routineId</code>.  Will also delete all the <code>routineActivities</code> whose routine is the one being deleted.  The request will be rejected if it is either missing a valid token, or if the user represented by the token is not the user that created the original routine.</p>
+<h4>Request Parameters</h4>
+<p>There are no request parameters.</p>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>success</code> (<code>boolean</code>): Will be true if the routine was deleted</li>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine</code></li>
+<li><code>name</code> (<code>string</code>): This is the name (or title) of the routine.</li>
+<li><code>goal</code> (<code>string</code>): This is like the description of the routine.</li>
+<li><code>creatorId</code> (<code>number</code>): This is the database identifier for the <code>user</code> which created this <code>routine</code></li>
+<li><code>isPublic</code> (<code>boolean</code>): Whether or not the routine should be visible to all users. <code>null</code> by default</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/posts/6&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;DELETE&quot;</span>,
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+    <span class="hljs-string">&#x27;Authorization&#x27;</span>: <span class="hljs-string">&#x27;Bearer TOKEN_STRING_HERE&#x27;</span>
+  }
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;success&quot;</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">6</span>,
+    <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">2</span>,
+    <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Long Cardio Day&quot;</span>,
+    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;A bunch of activities that will get your heart pumping!&quot;</span>
+}
+</code></pre>
 <h3><code>POST /routines/:routineId/activities</code></h3>
-<p>Attach a single activity to a routine. Prevent duplication on <code>(routineId, activityId)</code> pair.</p>
+<p>Attaches a single activity to a routine. Prevents duplication on <code>(routineId, activityId)</code> pair.</p>
+<h4>Request Parameters</h4>
+<ul>
+<li><code>activityId</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>count</code> (<code>number</code>): This is the number of times (reps) this activity should be performed for this routine.</li>
+<li><code>duration</code> (<code>number</code>): This is how long (in minutes) this activity should be performed for this routine.</li>
+</ul>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine_activity</code></li>
+<li><code>routineId</code> (<code>number</code>): This is the database identifier for the <code>routine</code></li>
+<li><code>activityId</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>count</code> (<code>number</code>): This is the number of times (reps) this activity should be performed for this routine.</li>
+<li><code>duration</code> (<code>number</code>): This is how long (in minutes) this activity should be performed for this routine.</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/routines/6/activities&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+  <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
+    <span class="hljs-attr">activityId</span>: <span class="hljs-number">7</span>,
+    <span class="hljs-attr">count</span>: <span class="hljs-number">1</span>, 
+    <span class="hljs-attr">duration</span>: <span class="hljs-number">20</span>
+  })
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<p>If the API associates the activity with the routine, the following object will be returned:</p>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">11</span>,
+    <span class="hljs-string">&quot;routineId&quot;</span>: <span class="hljs-number">6</span>,
+    <span class="hljs-string">&quot;activityId&quot;</span>: <span class="hljs-number">7</span>,
+    <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">20</span>,
+    <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">1</span>
+}
+</code></pre>
 <h2>routine_activities Endpoints</h2>
 <h3><code>PATCH /routine_activities/:routineActivityId</code> <code>(**)</code></h3>
 <p>Update the count or duration on the routine activity</p>
+<h4>Request Parameters</h4>
+<ul>
+<li><code>count</code> (<code>number</code>, optional): This is the number of times (reps) this activity should be performed for this routine.</li>
+<li><code>duration</code> (<code>number</code>, optional): This is how long (in minutes) this activity should be performed for this routine.</li>
+</ul>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine_activity</code></li>
+<li><code>routineId</code> (<code>number</code>): This is the database identifier for the <code>routine</code></li>
+<li><code>activityId</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>count</code> (<code>number</code>): This is the number of times (reps) this activity should be performed for this routine.</li>
+<li><code>duration</code> (<code>number</code>): This is how long (in minutes) this activity should be performed for this routine.</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/api/routine_activities/11&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;PATCH&quot;</span>,
+  <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
+    <span class="hljs-attr">count</span>: <span class="hljs-number">2</span>,
+    <span class="hljs-attr">duration</span>: <span class="hljs-number">30</span>
+  })
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<p>If the API successfully edits the routine, the following object will be returned:</p>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">11</span>,
+    <span class="hljs-string">&quot;routineId&quot;</span>: <span class="hljs-number">6</span>,
+    <span class="hljs-string">&quot;activityId&quot;</span>: <span class="hljs-number">7</span>,
+    <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">30</span>,
+    <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">2</span>
+}
+</code></pre>
 <h3><code>DELETE /routine_activities/:routineActivityId</code> <code>(**)</code></h3>
-<p>Remove an activity from a routine, use hard delete</p>
+<p>Remove an activity from a routine (hard deleting routine_activity), dissociating an activity from a routine.</p>
+<h4>Request Parameters</h4>
+<p>There are no request parameters.</p>
+<h4>Return Parameters</h4>
+<ul>
+<li><code>success</code> (<code>boolean</code>): Will be true if the routine_activity was deleted</li>
+<li><code>id</code> (<code>number</code>): This is the database identifier for the <code>routine_activity</code></li>
+<li><code>routineId</code> (<code>number</code>): This is the database identifier for the <code>routine</code></li>
+<li><code>activityId</code> (<code>number</code>): This is the database identifier for the <code>activity</code></li>
+<li><code>count</code> (<code>number</code>): This is the number of times (reps) this activity should be performed for this routine.</li>
+<li><code>duration</code> (<code>number</code>): This is how long (in minutes) this activity should be performed for this routine.</li>
+</ul>
+<h4>Sample Call</h4>
+<pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/routine_activities/11&#x27;</span>, {
+  <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;DELETE&quot;</span>,
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+    <span class="hljs-string">&#x27;Authorization&#x27;</span>: <span class="hljs-string">&#x27;Bearer TOKEN_STRING_HERE&#x27;</span>
+  }
+}).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+  })
+  .catch(<span class="hljs-built_in">console</span>.error);
+</code></pre>
+<h4>Sample Response</h4>
+<pre class="hljs language-js"><code>{
+    <span class="hljs-string">&quot;success&quot;</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">11</span>,
+    <span class="hljs-string">&quot;routineId&quot;</span>: <span class="hljs-number">6</span>,
+    <span class="hljs-string">&quot;activityId&quot;</span>: <span class="hljs-number">7</span>,
+    <span class="hljs-string">&quot;duration&quot;</span>: <span class="hljs-number">25</span>,
+    <span class="hljs-string">&quot;count&quot;</span>: <span class="hljs-number">1</span>
+}
+</code></pre>
     </div>
     <script src="app.js" defer></script>
   </body>

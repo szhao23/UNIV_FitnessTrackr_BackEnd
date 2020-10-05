@@ -16,7 +16,7 @@ const requiredNotSent = ({ requiredParams, atLeastOne = false }) => {
     if(atLeastOne) {
       let numParamsFound = 0;
       for(let param of requiredParams) {
-        if(req.body[param]) {
+        if(req.body[param] !== undefined) {
           numParamsFound++;
         }
       }
@@ -32,7 +32,7 @@ const requiredNotSent = ({ requiredParams, atLeastOne = false }) => {
       // figure out which ones are not defined, and return them
       const notSent = [];
       for(let param of requiredParams) {
-        if(!req.body[param]) {
+        if(req.body[param] === undefined) {
           notSent.push(param);
         }
       }
