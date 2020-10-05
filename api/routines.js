@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getAllPublicRoutines, createRoutine, updateRoutine, getRoutineById, destroyRoutine, addActivityToRoutine } = require('../db');
-const { requireUser } = require('./utils')
+const { requireUser, requiredNotSent } = require('./utils')
 
 
 
@@ -16,7 +16,7 @@ router.get('/', async (req, res, next) => {
 })
 
 // POST /routines
-router.post('/', requireUser, async (req, res, next) => {
+router.post('/', requireUser, requiredNotSent({requiredParams: ['name', 'goal']}), async (req, res, next) => {
   try {
     const {name, goal} = req.body;
     const createdRoutine = await createRoutine({creatorId: req.user.id, name, goal, isPublic: req.body.isPublic});
@@ -27,7 +27,7 @@ router.post('/', requireUser, async (req, res, next) => {
 });
 
 // PATCH /routines/:routineId
-router.patch('/:routineId', requireUser, async (req, res, next) => {
+router.patch('/:routineId', requireUser, requiredNotSent({requiredParams: ['name', 'goal'], atLeastOne: true}), async (req, res, next) => {
   try {
     const {name, goal} = req.body;
     const updatedRoutine = await updateRoutine({id: req.params.routineId, name, goal})
@@ -42,7 +42,11 @@ router.delete('/:routineId', requireUser, async (req, res, next) => {
   try {
     const routineToUpdate = await getRoutineById(req.params.routineId);
     if(req.user.id !== routineToUpdate.creatorId) {
-      res.sendStatus(403);
+      res.status(403);
+      next({
+        name: "WrongUserError",
+        message: "You must be the same user who created this routine to perform this action"
+      });
     }
     const deletedRoutine = await destroyRoutine(req.params.routineId)
     res.send(deletedRoutine);
@@ -52,7 +56,7 @@ router.delete('/:routineId', requireUser, async (req, res, next) => {
 });
 
 // POST /routines/:routineId/activities
-router.post('/:routineId/activities', async (req, res, next) => {
+router.post('/:routineId/activities', requiredNotSent({requiredParams: ['activityId', 'count', 'duration']}), async (req, res, next) => {
   try {
     const {activityId, count, duration} = req.body;
     const createdRoutineActivity = await addActivityToRoutine({ routineId: req.params.routineId, activityId, count, duration });

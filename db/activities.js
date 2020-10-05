@@ -51,7 +51,11 @@ async function createActivity({ name, description }){
 // return the new activity
 async function updateActivity(fields = {}){
   const { id } = fields;
-  const toUpdate = Object.assign({}, fields);
+  const toUpdate = {}
+  for(let column in fields) {
+    console.log('column: ', column);
+    if(fields[column]) toUpdate[column] = fields[column];
+  }
   delete toUpdate.id;
   let activity;
   try {

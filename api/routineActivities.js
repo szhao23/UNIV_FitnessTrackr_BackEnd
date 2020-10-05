@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { updateRoutineActivity, canEditRoutineActivity, destroyRoutineActivity } = require('../db');
 const client = require('../db/client');
-const { requireUser } = require('./utils')
+const { requireUser, requiredNotSent } = require('./utils')
 
 
 
 // PATCH /routine_activities/:routineActivityId
-router.patch('/:routineActivityId', requireUser, async (req, res, next) => {
+router.patch('/:routineActivityId', requireUser, requiredNotSent({requiredParams: ['count', 'duration'], atLeastOne: true}), async (req, res, next) => {
   try {
     const {count, duration} = req.body;
     if(!await canEditRoutineActivity(req.params.routineActivityId, req.user.id)) {
