@@ -3,7 +3,7 @@ const router = express.Router();
 const { getAllActivities, getActivityById, createActivity, updateActivity, getPublicRoutinesByActivity } = require('../db');
 const { requireUser, requiredNotSent } = require('./utils')
 
-// GET /activities/:activityId/routines
+// GET /api/activities/:activityId/routines
 router.get('/:activityId/routines', async (req, res, next) => {
   try {
     const routines = await getPublicRoutinesByActivity({id: req.params.activityId});
@@ -20,7 +20,7 @@ router.get('/:activityId/routines', async (req, res, next) => {
   }
 });
 
-// GET /activities
+// GET /api/activities
 router.get('/', async (req, res, next) => {
   try {
     const activities = await getAllActivities();
@@ -30,7 +30,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-// POST /activities
+// POST /api/activities
 router.post('/', requireUser, requiredNotSent({requiredParams: ['name', 'description']}), async (req, res, next) => {
   try {
     const {name, description} = req.body;
@@ -48,7 +48,7 @@ router.post('/', requireUser, requiredNotSent({requiredParams: ['name', 'descrip
   }
 });
 
-// PATCH /activities/:activityId
+// PATCH /api/activities/:activityId
 router.patch('/:activityId', requireUser, requiredNotSent({requiredParams: ['name', 'description'], atLeastOne: true}), async (req, res, next) => {
   try {
     const {activityId} = req.params;

@@ -33,7 +33,7 @@ server.get('/', (req, res) => {
 // error handling middleware
 server.use((error, req, res, next) => {
   console.error('SERVER ERROR: ', error);
-  res.send({error: error.message, ...error});
+  res.send({error: error.message, name: error.name, message: error.message, table: error.table});
 })
 server.listen(PORT, () => {
   console.log(chalk.blueBright('Server is listening on PORT:'), chalk.yellow(PORT), chalk.blueBright('Get your routine on!'));

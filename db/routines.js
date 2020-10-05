@@ -22,7 +22,7 @@ async function getRoutinesWithoutActivities(){
     `);
     return rows;
   } catch (error) {
-    console.error(error)
+    throw error
   }
 }
 async function getAllRoutines() {
@@ -37,7 +37,7 @@ async function getAllRoutines() {
     }
     return routines;
   } catch (error) {
-    console.error(error)
+    throw error
   }
 }
 async function getAllRoutinesByUser({username}) {
@@ -54,7 +54,7 @@ async function getAllRoutinesByUser({username}) {
     }
     return routines;
   } catch (error) {
-    console.error(error)
+    throw error
   }
 }
 async function getPublicRoutinesByUser({username}) {
@@ -72,7 +72,7 @@ async function getPublicRoutinesByUser({username}) {
     }
     return routines;
   } catch (error) {
-    console.error(error)
+    throw error
   }
 }
 async function getAllPublicRoutines() {
@@ -88,7 +88,7 @@ async function getAllPublicRoutines() {
     }
     return routines;
   } catch (error) {
-    console.error(error)
+    throw error
   }
 }
 async function getPublicRoutinesByActivity({id}) {
@@ -106,7 +106,7 @@ async function getPublicRoutinesByActivity({id}) {
     }
     return routines;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 
@@ -120,23 +120,29 @@ async function createRoutine({creatorId, isPublic, name, goal}) {
 
     return routine;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 
 async function updateRoutine({id, ...fields}) {
   try {
+    const toUpdate = {}
+    for(let column in fields) {
+      if(fields[column] !== undefined) toUpdate[column] = fields[column];
+    }
+    let routine;
     if (util.dbFields(fields).insert.length > 0) {
-      const {rows: [routine]} = await client.query(`
+      const {rows} = await client.query(`
           UPDATE routines 
-          SET ${ util.dbFields(fields).insert }
+          SET ${ util.dbFields(toUpdate).insert }
           WHERE id=${ id }
           RETURNING *;
-      `, Object.values(fields));
+      `, Object.values(toUpdate));
+      routine = rows[0];
       return routine;
     }
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 async function destroyRoutine(id) {
@@ -152,7 +158,7 @@ async function destroyRoutine(id) {
     `, [id]);
     return routine;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 

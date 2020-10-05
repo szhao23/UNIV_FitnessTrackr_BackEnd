@@ -33,7 +33,7 @@ async function getActivitiesByRoutineId(id) {
   `, [id]);
   return activities;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }
 // select and return an array of all activities
@@ -49,16 +49,14 @@ async function createActivity({ name, description }){
     throw error;
   }}
 // return the new activity
-async function updateActivity(fields = {}){
-  const { id } = fields;
-  const toUpdate = {}
-  for(let column in fields) {
-    console.log('column: ', column);
-    if(fields[column]) toUpdate[column] = fields[column];
-  }
-  delete toUpdate.id;
-  let activity;
+async function updateActivity({id, ...fields}){
   try {
+    const toUpdate = {}
+    for(let column in fields) {
+      console.log('column: ', column);
+      if(fields[column] !== undefined) toUpdate[column] = fields[column];
+    }
+    let activity;
     if (util.dbFields(toUpdate).insert.length > 0) {
       const {rows} = await client.query(`
         UPDATE activities
@@ -68,11 +66,10 @@ async function updateActivity(fields = {}){
       `, Object.values(toUpdate));
       activity = rows[0];
     }
+    return activity;
   } catch (error) {
-    console.error(error)
+    throw error
   }
-
-  return activity;
 }
 // don't try to update the id
 // do update the name and description

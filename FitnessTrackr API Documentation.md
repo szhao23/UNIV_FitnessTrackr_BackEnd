@@ -29,6 +29,7 @@ If the token is malformed, missing, or has been revoked, you will get a response
 
 ```js
 {
+  "error": "You must be logged in to perform this action",
   "name": "MissingUserError",
   "message": "You must be logged in to perform this action"
 }
@@ -39,16 +40,17 @@ If the token is malformed, missing, or has been revoked, you will get a response
 ERROR
 ```js
 {
-  "name": "MissingUserError",
-  "message": "You must be logged in to perform this action"
+  "error": "No activity by ID 10",
+  "name": "NotFound",
+  "message": "No activity by ID 10"
 }
 ```
 SUCCESS (sends back created/updated entity)
 ```js
 {
-    "id": 9,
-    "name": "bench press 4",
-    "description": "4 sets of 10. Lift a safe amount, but push yourself!"
+  "id": 9,
+  "name": "Biceps",
+  "description": "Yep, it's that day again!"
 }
 ```
 
@@ -115,7 +117,7 @@ This route is used for a user to login when they already have an account. On suc
 #### Return Parameters
 
 * `user` (`object`)
-  * `id` (`string`): the database identifier of the user
+  * `id` (`number`): the database identifier of the user
   * `username` (`string`): the username of the user
 * `message` (`string`): the success message
 * `token` (`string`): the JSON Web Token which is used to authenticate the user with any future calls
@@ -125,6 +127,10 @@ This route is used for a user to login when they already have an account. On suc
 ```js
 fetch('http://fitnesstrac-kr.herokuapp.com/api/users/login', {
   method: "POST",
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer TOKEN_STRING_HERE'
+  },
   body: JSON.stringify({
     username: 'superman27',
     password: 'krypt0n0rbust'
@@ -161,7 +167,7 @@ No request parameters are necessary for this route.
 
 #### Return Parameters
 
-* `id` (`string`): the database identifier of the user
+* `id` (`number`): the database identifier of the user
 * `username` (`string`): the username of the user
 
 #### Sample Call
@@ -190,7 +196,72 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/users/me', {
 
 ### `GET /users/:username/routines`
 
-Get a list of public routines for a particular user.
+This route returns a list of public routines for a particular user.
+
+#### Request Parameters
+
+There are no request parameters.
+
+#### Return Parameters
+
+(`array` of `object`):
+  * `id` (`number`): This is the database identifier for the `routine` object.
+  * `creatorId` (`number`): This is the database identifier for the `user` which created this `routine`
+  * `creatorName` (`string`): This is the username for the `user` which created this `routine`
+  * `isPublic` (`boolean`): Whether or not the routine should be visible to all users (will always be true for public routes)
+  * `name` (`string`): This is the name (or title) of the routine.
+  * `goal` (`string`): This is like the description of the routine.
+  * `routine` (`array` of `routine` objects): An array of activities associated with this routine.
+    * `id` (`number`): This is the database identifier for the `activity`
+    * `name` (`string`): This is the name (or title) of the activity.
+    * `description` (`string`): This is the description of the activity.
+    * `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
+    * `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/users/albert/routines', {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+```js
+[
+    {
+        "id": 2,
+        "creatorId": 1,
+        "isPublic": true,
+        "name": "Chest Day",
+        "goal": "To beef up the Chest and Triceps!",
+        "creatorName": "albert",
+        "activities": [
+            {
+                "id": 3,
+                "name": "bench press",
+                "description": "3 sets of 10. Lift a safe amount, but push yourself!",
+                "duration": 8,
+                "count": 10
+            },
+            {
+                "id": 4,
+                "name": "Push Ups",
+                "description": "Pretty sure you know what to do!",
+                "duration": 7,
+                "count": 10
+            }
+        ]
+    }
+]
+```
  
 ## Activities Endpoints
 
@@ -198,39 +269,522 @@ Get a list of public routines for a particular user.
 
 Just returns a list of all activities in the database
 
+#### Request Parameters
+
+There are no request parameters.
+
+#### Return Parameters
+
+(`array` of `object`):
+  * `id` (`number`): This is the database identifier for the `activity`
+  * `name` (`string`): This is the name (or title) of the activity.
+  * `description` (`string`): This is the description of the activity.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/activities', {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+```js
+[
+    {
+        "id": 2,
+        "name": "Incline Dumbbell Hammer Curl",
+        "description": "Lie down face up on an incline bench and lift thee barbells slowly upward toward chest"
+    },
+    {
+        "id": 3,
+        "name": "bench press",
+        "description": "Lift a safe amount, but push yourself!"
+    },
+    {
+        "id": 4,
+        "name": "Push Ups",
+        "description": "Pretty sure you know what to do!"
+    },
+    {
+        "id": 5,
+        "name": "squats",
+        "description": "Heavy lifting."
+    },
+    {
+        "id": 6,
+        "name": "treadmill",
+        "description": "running"
+    },
+    {
+        "id": 7,
+        "name": "stairs",
+        "description": "climb those stairs"
+    },
+    {
+        "id": 8,
+        "name": "elliptical",
+        "description": "using the elliptical machine"
+    },
+    {
+        "id": 1,
+        "name": "standing barbell curl",
+        "description": "Lift that barbell!"
+    }
+]
+```
+
 ### `POST /activities` `(*)`
 
-Create a new activity
+A request to this endpoint will attempt to create a new activity. You must pass a valid token with this request, or it will be rejected.
+
+#### Request Parameters
+
+* `name` (`string`, required): the desired name for the new activity
+* `description` (`string`, required): the desired description for the new activity
+
+#### Return Parameters
+
+* `id` (`number`): This is the database identifier for the `activity`
+* `name` (`string`): This is the name (or title) of the activity.
+* `description` (`string`): This is the description of the activity.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/activities', {
+  method: "POST",
+  body: JSON.stringify({
+    name: 'Running',
+    description: 'Keep on running!'
+  })
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+If the API creates a new activity, the following object will be returned:
+
+```js
+{
+    "id": 9,
+    "name": "Running",
+    "description": "Keep on running!"
+}
+```
+
 
 ### `PATCH /activities/:activityId` `(*)`
 
 Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)
 
+#### Request Parameters
+
+* `name` (`string`, optional): the desired new name for the activity
+* `description` (`string`, optional): the desired new description for the activity
+
+#### Return Parameters
+
+* `id` (`number`): This is the database identifier for the `activity`
+* `name` (`string`): This is the name (or title) of the activity.
+* `description` (`string`): This is the description of the activity.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/activities/9', {
+  method: "PATCH",
+  body: JSON.stringify({
+    name: 'Running',
+    description: 'Keep on running, til you drop!'
+  })
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+If the API successfully edits the activity, the following object will be returned:
+
+```js
+{
+    "id": 9,
+    "name": "Running",
+    "description": "Keep on running, til you drop!"
+}
+```
+
 ### `GET /activities/:activityId/routines`
 
-Get a list of all public routines which feature that activity
+This route returns a list of public routines which feature that activity
+
+#### Request Parameters
+
+There are no request parameters.
+
+#### Return Parameters
+
+(`array` of `object`):
+  * `id` (`number`): This is the database identifier for the `routine` object.
+  * `creatorId` (`number`): This is the database identifier for the `user` which created this `routine`
+  * `creatorName` (`string`): This is the username for the `user` which created this `routine`
+  * `isPublic` (`boolean`): Whether or not the routine should be visible to all users (will always be true for public routes)
+  * `name` (`string`): This is the name (or title) of the routine.
+  * `goal` (`string`): This is like the description of the routine.
+  * `routine` (`array` of `routine` objects): An array of activities associated with this routine.
+    * `id` (`number`): This is the database identifier for the `activity`
+    * `name` (`string`): This is the name (or title) of the activity.
+    * `description` (`string`): This is the description of the activity.
+    * `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
+    * `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/activities/3/routines', {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+```js
+[
+    {
+        "id": 2,
+        "creatorId": 1,
+        "isPublic": true,
+        "name": "Chest Day",
+        "goal": "To beef up the Chest and Triceps!",
+        "creatorName": "albert",
+        "activities": [
+            {
+                "id": 3,
+                "name": "bench press",
+                "description": "Lift a safe amount, but push yourself!",
+                "duration": 8,
+                "count": 10
+            },
+            {
+                "id": 4,
+                "name": "Push Ups",
+                "description": "Pretty sure you know what to do!",
+                "duration": 7,
+                "count": 10
+            }
+        ]
+    }
+]
+```
 
 ## Routines Endpoints
 
 ### `GET /routines`
 
-Return a list of public routines, include the activities with them
+This route returns a list of all public routines
+
+#### Request Parameters
+
+There are no request parameters.
+
+#### Return Parameters
+
+(`array` of `object`):
+  * `id` (`number`): This is the database identifier for the `routine` object.
+  * `creatorId` (`number`): This is the database identifier for the `user` which created this `routine`
+  * `creatorName` (`string`): This is the username for the `user` which created this `routine`
+  * `isPublic` (`boolean`): Whether or not the routine should be visible to all users (will always be true for public routes)
+  * `name` (`string`): This is the name (or title) of the routine.
+  * `goal` (`string`): This is like the description of the routine.
+  * `routine` (`array` of `routine` objects): An array of activities associated with this routine.
+    * `id` (`number`): This is the database identifier for the `activity`
+    * `name` (`string`): This is the name (or title) of the activity.
+    * `description` (`string`): This is the description of the activity.
+    * `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
+    * `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/routines', {
+  headers: {
+    'Content-Type': 'application/json',
+  },
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+```js
+[
+    {
+        "id": 2,
+        "creatorId": 1,
+        "isPublic": true,
+        "name": "Chest Day",
+        "goal": "To beef up the Chest and Triceps!",
+        "creatorName": "albert",
+        "activities": [
+            {
+                "id": 3,
+                "name": "bench press",
+                "description": "Lift a safe amount, but push yourself!",
+                "duration": 8,
+                "count": 10
+            },
+            {
+                "id": 4,
+                "name": "Push Ups",
+                "description": "Pretty sure you know what to do!",
+                "duration": 7,
+                "count": 10
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "creatorId": 2,
+        "isPublic": true,
+        "name": "Cardio Day",
+        "goal": "Running, stairs. Stuff that gets your heart pumping!",
+        "creatorName": "sandra",
+        "activities": [
+            {
+                "id": 6,
+                "name": "treadmill",
+                "description": "running",
+                "duration": 10,
+                "count": 10
+            },
+            {
+                "id": 7,
+                "name": "stairs",
+                "description": "climb those stairs",
+                "duration": 15,
+                "count": 10
+            }
+        ]
+    }
+]
+```
 
 ### `POST /routines` `(*)`
 
-Create a new routine
+A request to this endpoint will attempt to create a new routine. You must pass a valid token with this request, or it will be rejected.
+
+#### Request Parameters
+
+* `name` (`string`, required): the desired name for the new routine
+* `goal` (`string`, required): the desired goal description of the routine.
+* `isPublic` (`boolean`, optional): Whether or not the routine should be visible to all users. `null` by default
+
+#### Return Parameters
+
+* `id` (`number`): This is the database identifier for the `routine`
+* `name` (`string`): This is the name (or title) of the routine.
+* `goal` (`string`): This is like the description of the routine.
+* `creatorId` (`number`): This is the database identifier for the `user` which created this `routine`
+* `isPublic` (`boolean`): Whether or not the routine should be visible to all users. `null` by default
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/routines', {
+  method: "POST",
+  body: JSON.stringify({
+    name: 'Long Cardio Routine',
+    description: 'A bunch of activities that will get your heart pumping!',
+    isPublic: true
+  })
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+If the API creates a new routine, the following object will be returned:
+
+```js
+{
+    "id": 8,
+    "creatorId": 2,
+    "isPublic": true,
+    "name": "Long Cardio Routine",
+    "goal": "A bunch of activities that will get your heart pumping!"
+}
+```
 
 ### `PATCH /routines/:routineId` `(**)`
 
 Update a routine, notably change public/private, the name, or the goal
 
+#### Request Parameters
+
+* `name` (`string`, optional): the desired new name for the routine
+* `goal` (`string`, optional): the desired new goal description of the routine.
+* `isPublic` (`boolean`, optional): Whether or not the routine should be visible to all users. `null` by default
+
+#### Return Parameters
+
+* `id` (`number`): This is the database identifier for the `routine`
+* `name` (`string`): This is the name (or title) of the routine.
+* `goal` (`string`): This is like the description of the routine.
+* `creatorId` (`number`): This is the database identifier for the `user` which created this `routine`
+* `isPublic` (`boolean`): Whether or not the routine should be visible to all users. `null` by default
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/6', {
+  method: "PATCH",
+  body: JSON.stringify({
+    name: 'Long Cardio Day',
+    goal: 'A bunch of activities that will get your heart pumping!'
+  })
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+If the API successfully edits the routine, the following object will be returned:
+
+```js
+{
+    "id": 6,
+    "creatorId": 2,
+    "isPublic": true,
+    "name": "Long Cardio Day",
+    "goal": "A bunch of activities that will get your heart pumping!"
+}
+```
+
 ### `DELETE /routines/:routineId` `(**)`
 
 Hard delete a routine. Make sure to delete all the `routineActivities` whose routine is the one being deleted.
 
+This endpoint will hard delete a routine whose `id` is equal to `routineId`.  Will also delete all the `routineActivities` whose routine is the one being deleted.  The request will be rejected if it is either missing a valid token, or if the user represented by the token is not the user that created the original routine.
+
+#### Request Parameters
+
+There are no request parameters.
+
+#### Return Parameters
+
+* `success` (`boolean`): Will be true if the routine was deleted
+* `id` (`number`): This is the database identifier for the `routine`
+* `name` (`string`): This is the name (or title) of the routine.
+* `goal` (`string`): This is like the description of the routine.
+* `creatorId` (`number`): This is the database identifier for the `user` which created this `routine`
+* `isPublic` (`boolean`): Whether or not the routine should be visible to all users. `null` by default
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/posts/6', {
+  method: "DELETE",
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer TOKEN_STRING_HERE'
+  }
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+```js
+{
+    "success": true,
+    "id": 6,
+    "creatorId": 2,
+    "isPublic": true,
+    "name": "Long Cardio Day",
+    "goal": "A bunch of activities that will get your heart pumping!"
+}
+```
+
 ### `POST /routines/:routineId/activities`
 
-Attach a single activity to a routine. Prevent duplication on `(routineId, activityId)` pair.
+Attaches a single activity to a routine. Prevents duplication on `(routineId, activityId)` pair.
+
+#### Request Parameters
+
+* `activityId` (`number`): This is the database identifier for the `activity`
+* `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+* `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
+
+#### Return Parameters
+
+* `id` (`number`): This is the database identifier for the `routine_activity`
+* `routineId` (`number`): This is the database identifier for the `routine`
+* `activityId` (`number`): This is the database identifier for the `activity`
+* `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+* `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/6/activities', {
+  method: "POST",
+  body: JSON.stringify({
+    activityId: 7,
+    count: 1, 
+    duration: 20
+  })
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+If the API associates the activity with the routine, the following object will be returned:
+
+```js
+{
+    "id": 11,
+    "routineId": 6,
+    "activityId": 7,
+    "duration": 20,
+    "count": 1
+}
+```
 
 ## routine_activities Endpoints
 
@@ -238,6 +792,91 @@ Attach a single activity to a routine. Prevent duplication on `(routineId, activ
 
 Update the count or duration on the routine activity
 
+#### Request Parameters
+
+* `count` (`number`, optional): This is the number of times (reps) this activity should be performed for this routine.
+* `duration` (`number`, optional): This is how long (in minutes) this activity should be performed for this routine.
+
+#### Return Parameters
+
+* `id` (`number`): This is the database identifier for the `routine_activity`
+* `routineId` (`number`): This is the database identifier for the `routine`
+* `activityId` (`number`): This is the database identifier for the `activity`
+* `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+* `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/api/routine_activities/11', {
+  method: "PATCH",
+  body: JSON.stringify({
+    count: 2,
+    duration: 30
+  })
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+If the API successfully edits the routine, the following object will be returned:
+
+```js
+{
+    "id": 11,
+    "routineId": 6,
+    "activityId": 7,
+    "duration": 30,
+    "count": 2
+}
+```
+
 ### `DELETE /routine_activities/:routineActivityId` `(**)`
 
-Remove an activity from a routine, use hard delete
+Remove an activity from a routine (hard deleting routine_activity), dissociating an activity from a routine.
+
+#### Request Parameters
+
+There are no request parameters.
+
+#### Return Parameters
+
+* `success` (`boolean`): Will be true if the routine_activity was deleted
+* `id` (`number`): This is the database identifier for the `routine_activity`
+* `routineId` (`number`): This is the database identifier for the `routine`
+* `activityId` (`number`): This is the database identifier for the `activity`
+* `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+* `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
+
+#### Sample Call
+
+```js
+fetch('http://fitnesstrac-kr.herokuapp.com/api/routine_activities/11', {
+  method: "DELETE",
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer TOKEN_STRING_HERE'
+  }
+}).then(response => response.json())
+  .then(result => {
+    console.log(result);
+  })
+  .catch(console.error);
+```
+
+#### Sample Response
+
+```js
+{
+    "success": true,
+    "id": 11,
+    "routineId": 6,
+    "activityId": 7,
+    "duration": 25,
+    "count": 1
+}
+```
