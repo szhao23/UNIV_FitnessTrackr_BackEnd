@@ -39,20 +39,19 @@ async function getUser({username, password}) {
 async function getUserById(userId) {
   // first get the user
   try {
-    const {rows} = await client.query(`
+    const {rows: [user]} = await client.query(`
       SELECT *
       FROM users
       WHERE id = $1;
     `, [userId]);
     // if it doesn't exist, return null
-    if (!rows || !rows.length) return null;
+    if (!user) return null;
     // if it does:
     // delete the 'password' key from the returned object
-    const [user] = rows;
     delete user.password; 
     return user;  
   } catch (error) {
-    console.error(error)
+    throw error;
   }
 }
 async function getUserByUsername(userName) {

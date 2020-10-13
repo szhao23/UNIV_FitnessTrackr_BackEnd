@@ -2,11 +2,20 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { getUserById } = require('../db');
+const client = require('../db/client');
 const { JWT_SECRET } = process.env || 'neverTell';
 
 // GET /api/health
-router.get('/health', (req, res, next) => {
-  res.send({message: 'healthy'})
+router.get('/health', async (req, res, next) => {
+  try {
+    const uptime = process.uptime();
+    const {rows: [dbConnection]} = await client.query('SELECT NOW();');
+    const currentTime = new Date();
+    const lastRestart = new Intl.DateTimeFormat('en', {timeStyle: 'long', dateStyle: 'long', timeZone: "America/Los_Angeles"}).format(currentTime - uptime);
+    res.send({message: 'healthy', uptime, dbConnection, currentTime, lastRestart});
+  } catch (err) {
+    next(err);
+  }
 });
 
 
