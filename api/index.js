@@ -11,7 +11,7 @@ router.get('/health', async (req, res, next) => {
     const uptime = process.uptime();
     const {rows: [dbConnection]} = await client.query('SELECT NOW();');
     const currentTime = new Date();
-    const lastRestart = new Intl.DateTimeFormat('en', {timeStyle: 'long', dateStyle: 'long', timeZone: "America/Los_Angeles"}).format(currentTime - uptime);
+    const lastRestart = new Intl.DateTimeFormat('en', {timeStyle: 'long', dateStyle: 'long', timeZone: "America/Los_Angeles"}).format(currentTime - (uptime * 1000));
     res.send({message: 'healthy', uptime, dbConnection, currentTime, lastRestart});
   } catch (err) {
     next(err);
