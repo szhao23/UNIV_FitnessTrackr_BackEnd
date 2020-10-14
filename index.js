@@ -28,13 +28,19 @@ server.use('/api', require('./api'));
 
 server.get('/', (req, res) => {
   res.redirect('/docs');
-})
+});
+
+// 404 handler
+server.get('*', (req, res) => {
+  res.status(404).send({error: '404 - Not Found', message: 'No route found for the requested URL'});
+});
 
 // error handling middleware
 server.use((error, req, res, next) => {
   console.error('SERVER ERROR: ', error);
   res.send({error: error.message, name: error.name, message: error.message, table: error.table});
-})
+});
+
 server.listen(PORT, () => {
   console.log(chalk.blueBright('Server is listening on PORT:'), chalk.yellow(PORT), chalk.blueBright('Get your routine on!'));
 });
