@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const { createUser, getUserByUsername, getPublicRoutinesByUser, getUser } = require('../db');
+const { createUser, getUserByUsername, getPublicRoutinesByUser, getAllRoutinesByUser, getUser } = require('../db');
 const { requireUser } = require('./utils');
 const SALT_COUNT = 10;
 const { JWT_SECRET } = process.env || 'neverTell';
@@ -89,6 +89,9 @@ router.get('/:username/routines', async (req, res, next) => {
         name: 'NoUser',
         message: `Error looking up user ${username}`
       });
+    } else if(req.user && user.id === req.user.id) {
+      const routines = await getAllRoutinesByUser({username: username});
+      res.send(routines);
     } else {
       const routines = await getPublicRoutinesByUser({username: username});
       res.send(routines);
