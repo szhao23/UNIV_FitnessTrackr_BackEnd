@@ -530,7 +530,7 @@
   <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
   <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
     <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Long Cardio Routine&#x27;</span>,
-    <span class="hljs-attr">description</span>: <span class="hljs-string">&#x27;A bunch of activities that will get your heart pumping!&#x27;</span>,
+    <span class="hljs-attr">goal</span>: <span class="hljs-string">&#x27;To get your heart pumping!&#x27;</span>,
     <span class="hljs-attr">isPublic</span>: <span class="hljs-literal">true</span>
   })
 }).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
@@ -546,7 +546,7 @@
     <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">2</span>,
     <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
     <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Long Cardio Routine&quot;</span>,
-    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;A bunch of activities that will get your heart pumping!&quot;</span>
+    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;To get your heart pumping!&quot;</span>
 }
 </code></pre>
 <h3><code>PATCH /routines/:routineId</code> <code>(**)</code></h3>
@@ -570,7 +570,7 @@
   <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;PATCH&quot;</span>,
   <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
     <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Long Cardio Day&#x27;</span>,
-    <span class="hljs-attr">goal</span>: <span class="hljs-string">&#x27;A bunch of activities that will get your heart pumping!&#x27;</span>
+    <span class="hljs-attr">goal</span>: <span class="hljs-string">&#x27;ATo et your heart pumping!&#x27;</span>
   })
 }).then(<span class="hljs-function"><span class="hljs-params">response</span> =&gt;</span> response.json())
   .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
@@ -585,7 +585,7 @@
     <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">2</span>,
     <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
     <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Long Cardio Day&quot;</span>,
-    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;A bunch of activities that will get your heart pumping!&quot;</span>
+    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;To get your heart pumping!&quot;</span>
 }
 </code></pre>
 <h3><code>DELETE /routines/:routineId</code> <code>(**)</code></h3>
@@ -622,7 +622,7 @@
     <span class="hljs-string">&quot;creatorId&quot;</span>: <span class="hljs-number">2</span>,
     <span class="hljs-string">&quot;isPublic&quot;</span>: <span class="hljs-literal">true</span>,
     <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Long Cardio Day&quot;</span>,
-    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;A bunch of activities that will get your heart pumping!&quot;</span>
+    <span class="hljs-string">&quot;goal&quot;</span>: <span class="hljs-string">&quot;To get your heart pumping!&quot;</span>
 }
 </code></pre>
 <h3><code>POST /routines/:routineId/activities</code></h3>

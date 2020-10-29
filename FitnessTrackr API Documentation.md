@@ -617,7 +617,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/routines', {
   method: "POST",
   body: JSON.stringify({
     name: 'Long Cardio Routine',
-    description: 'A bunch of activities that will get your heart pumping!',
+    goal: 'To get your heart pumping!',
     isPublic: true
   })
 }).then(response => response.json())
@@ -637,7 +637,7 @@ If the API creates a new routine, the following object will be returned:
     "creatorId": 2,
     "isPublic": true,
     "name": "Long Cardio Routine",
-    "goal": "A bunch of activities that will get your heart pumping!"
+    "goal": "To get your heart pumping!"
 }
 ```
 
@@ -666,7 +666,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/6', {
   method: "PATCH",
   body: JSON.stringify({
     name: 'Long Cardio Day',
-    goal: 'A bunch of activities that will get your heart pumping!'
+    goal: 'To get your heart pumping!'
   })
 }).then(response => response.json())
   .then(result => {
@@ -685,7 +685,7 @@ If the API successfully edits the routine, the following object will be returned
     "creatorId": 2,
     "isPublic": true,
     "name": "Long Cardio Day",
-    "goal": "A bunch of activities that will get your heart pumping!"
+    "goal": "To get your heart pumping!"
 }
 ```
 
@@ -733,7 +733,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/posts/6', {
     "creatorId": 2,
     "isPublic": true,
     "name": "Long Cardio Day",
-    "goal": "A bunch of activities that will get your heart pumping!"
+    "goal": "To get your heart pumping!"
 }
 ```
 
