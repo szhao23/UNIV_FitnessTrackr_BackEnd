@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllActivities, getActivityById, createActivity, updateActivity, getPublicRoutinesByActivity } = require('../db');
+const { getAllActivities, getActivityById, getActivityByName, createActivity, updateActivity, getPublicRoutinesByActivity } = require('../db');
 const { requireUser, requiredNotSent } = require('./utils')
 
 // GET /api/activities/:activityId/routines
@@ -34,14 +34,22 @@ router.get('/', async (req, res, next) => {
 router.post('/', requireUser, requiredNotSent({requiredParams: ['name', 'description']}), async (req, res, next) => {
   try {
     const {name, description} = req.body;
-    const createdActivity = await createActivity({name, description});
-    if(createdActivity) {
-      res.send(createdActivity);
-    } else {
+    const existingActivity = await getActivityByName(name);
+    if(existingActivity) {
       next({
-        name: 'FailedToCreate',
-        message: 'There was an error creating your activity'
-      })
+        name: 'NotFound',
+        message: `An activity with name ${name} already exists`
+      });
+    } else {
+      const createdActivity = await createActivity({name, description});
+      if(createdActivity) {
+        res.send(createdActivity);
+      } else {
+        next({
+          name: 'FailedToCreate',
+          message: 'There was an error creating your activity'
+        })
+      }
     }
   } catch (error) {
     next(error);

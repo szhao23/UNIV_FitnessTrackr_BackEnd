@@ -23,6 +23,17 @@ async function getActivityById(id){
     throw error;
   }
 }
+async function getActivityByName(name){
+  try {
+    const {rows: [activity]} = await client.query(`
+      SELECT * FROM activities
+      WHERE name = $1
+    `, [name]);
+    return activity;
+  } catch (error) {
+    throw error;
+  }
+}
 async function getActivitiesByRoutineId(id) {
   try {
     const { rows: activities } = await client.query(`
@@ -77,6 +88,7 @@ async function updateActivity({id, ...fields}){
 module.exports = {
   getAllActivities,
   getActivityById,
+  getActivityByName,
   getActivitiesByRoutineId,
   createActivity,
   updateActivity,
