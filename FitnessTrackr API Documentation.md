@@ -711,7 +711,7 @@ There are no request parameters.
 #### Sample Call
 
 ```js
-fetch('http://fitnesstrac-kr.herokuapp.com/api/posts/6', {
+fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/6', {
   method: "DELETE",
   headers: {
     'Content-Type': 'application/json',
