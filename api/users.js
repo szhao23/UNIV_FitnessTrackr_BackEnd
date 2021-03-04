@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { createUser, getUserByUsername, getPublicRoutinesByUser, getAllRoutinesByUser, getUser } = require('../db');
 const { requireUser } = require('./utils');
 const SALT_COUNT = 10;
-const { JWT_SECRET } = process.env || 'neverTell';
+const { JWT_SECRET = 'neverTell' } = process.env;
 
 // POST /api/users/login
 router.post('/login', async (req, res, next) => {

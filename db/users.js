@@ -7,7 +7,7 @@ const SALT_COUNT = 10;
 
 // user functions
 async function createUser({ username, password}) {
-  const hashedPassword = await bcrypt.hashSync(password, SALT_COUNT);
+  const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
     const {rows: [user]} = await client.query(`
       INSERT INTO users(username, password) VALUES ($1, $2)
@@ -27,8 +27,9 @@ async function getUser({username, password}) {
   try {
     const user = await getUserByUsername(username);
     if(!user) return;
-    const matchingPassword = bcrypt.compareSync(password, user.password);
-    if(!matchingPassword) return;
+    const hashedPassword = user.password;
+    const passwordsMatch = await bcrypt.compare(password, hashedPassword);
+    if(!passwordsMatch) return;
     delete user.password;
     return user;
   } catch (error) {
