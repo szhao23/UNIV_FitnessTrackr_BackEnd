@@ -1,5 +1,5 @@
 const client = require('./client')
-const { getActivitiesByRoutineId } = require('./activities')
+const { attachActivitiesToRoutines } = require('./activities')
 const { getUserByUsername } = require('./users')
 const util = require('./util');
 
@@ -32,10 +32,7 @@ async function getAllRoutines() {
     FROM routines
     JOIN users ON routines."creatorId" = users.id 
     `);
-    for (let routine of routines) {
-      routine.activities = await getActivitiesByRoutineId(routine.id);
-    }
-    return routines;
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error
   }
@@ -49,10 +46,7 @@ async function getAllRoutinesByUser({username}) {
     JOIN users ON routines."creatorId" = users.id 
     WHERE "creatorId" = $1
     `, [user.id]);
-    for (let routine of routines) {
-      routine.activities = await getActivitiesByRoutineId(routine.id);
-    }
-    return routines;
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error
   }
@@ -67,10 +61,7 @@ async function getPublicRoutinesByUser({username}) {
     WHERE "creatorId" = $1
     AND "isPublic" = true
     `, [user.id]);
-    for (let routine of routines) {
-      routine.activities = await getActivitiesByRoutineId(routine.id);
-    }
-    return routines;
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error
   }
@@ -83,10 +74,7 @@ async function getAllPublicRoutines() {
     JOIN users ON routines."creatorId" = users.id
     WHERE "isPublic" = true
     `);
-    for (let routine of routines) {
-      routine.activities = await getActivitiesByRoutineId(routine.id);
-    }
-    return routines;
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error
   }
@@ -94,17 +82,14 @@ async function getAllPublicRoutines() {
 async function getPublicRoutinesByActivity({id}) {
   try {
     const { rows: routines } = await client.query(`
-    SELECT routines.*, users.username AS "creatorName"
-    FROM routines
-    JOIN users ON routines."creatorId" = users.id
-    JOIN routine_activities ON routine_activities."routineId" = routines.id
-    WHERE routines."isPublic" = true
-    AND routine_activities."activityId" = $1;
-  `, [id]);
-    for (let routine of routines) {
-      routine.activities = await getActivitiesByRoutineId(routine.id);
-    }
-    return routines;
+      SELECT routines.*, users.username AS "creatorName"
+      FROM routines
+      JOIN users ON routines."creatorId" = users.id
+      JOIN routine_activities ON routine_activities."routineId" = routines.id
+      WHERE routines."isPublic" = true
+      AND routine_activities."activityId" = $1;
+    `, [id]);
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
     throw error;
   }
