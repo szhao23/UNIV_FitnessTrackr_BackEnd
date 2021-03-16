@@ -69,6 +69,9 @@
 <h4>Sample Call</h4>
 <pre class="hljs language-js"><code>fetch(<span class="hljs-string">&#x27;http://fitnesstrac-kr.herokuapp.com/api/users/register&#x27;</span>, {
   <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+  <span class="hljs-attr">headers</span>: {
+    <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>
+  },
   <span class="hljs-attr">body</span>: <span class="hljs-built_in">JSON</span>.stringify({
     <span class="hljs-attr">username</span>: <span class="hljs-string">&#x27;superman27&#x27;</span>,
     <span class="hljs-attr">password</span>: <span class="hljs-string">&#x27;krypt0n0rbust&#x27;</span>

@@ -79,6 +79,9 @@ This route is used to create a new user account. On success, you will be given a
 ```js
 fetch('http://fitnesstrac-kr.herokuapp.com/api/users/register', {
   method: "POST",
+  headers: {
+    'Content-Type': 'application/json',
+  },
   body: JSON.stringify({
     username: 'superman27',
     password: 'krypt0n0rbust'
