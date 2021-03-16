@@ -129,7 +129,6 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/users/login', {
   method: "POST",
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer TOKEN_STRING_HERE'
   },
   body: JSON.stringify({
     username: 'superman27',
