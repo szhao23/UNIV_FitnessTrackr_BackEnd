@@ -196,13 +196,13 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/users/me', {
 }
 ```
 
-### `GET /users/:username/routines`
+### `GET /api/users/:username/routines`
 
 This route returns a list of public routines for a particular user.
 
 #### Request Parameters
 
-There are no request parameters.
+There are no request parameters, but **if a token is sent in the Authorization header, both public and private routines will be sent back foor the requested user**.
 
 #### Return Parameters
 
@@ -213,12 +213,14 @@ There are no request parameters.
   * `isPublic` (`boolean`): Whether or not the routine should be visible to all users (will always be true for public routes)
   * `name` (`string`): This is the name (or title) of the routine.
   * `goal` (`string`): This is like the description of the routine.
-  * `routine` (`array` of `routine` objects): An array of activities associated with this routine.
+  * `activity` (`array` of `activity` objects): An array of activities associated with this routine.
     * `id` (`number`): This is the database identifier for the `activity`
     * `name` (`string`): This is the name (or title) of the activity.
     * `description` (`string`): This is the description of the activity.
     * `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
     * `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+    * `routineActivityId` (`number`): This is the database identifier for the `routine_activity`
+    * `routineId` (`number`): This is the database identifier for the `routine`
 
 #### Sample Call
 
@@ -251,14 +253,18 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/users/albert/routines', {
                 "name": "bench press",
                 "description": "3 sets of 10. Lift a safe amount, but push yourself!",
                 "duration": 8,
-                "count": 10
+                "count": 10,
+                "routineActivityId": 6,
+                "routineId": 2
             },
             {
                 "id": 4,
                 "name": "Push Ups",
                 "description": "Pretty sure you know what to do!",
                 "duration": 7,
-                "count": 10
+                "count": 10,
+                "routineActivityId": 7,
+                "routineId": 2
             }
         ]
     }
@@ -267,7 +273,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/users/albert/routines', {
  
 ## Activities Endpoints
 
-### `GET /activities`
+### `GET /api/activities`
 
 Just returns a list of all activities in the database
 
@@ -343,7 +349,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/activities', {
 ]
 ```
 
-### `POST /activities` `(*)`
+### `POST /api/activities` `(*)`
 
 A request to this endpoint will attempt to create a new activity. You must pass a valid token with this request, or it will be rejected.
 
@@ -387,7 +393,7 @@ If the API creates a new activity, the following object will be returned:
 ```
 
 
-### `PATCH /activities/:activityId` `(*)`
+### `PATCH /api/activities/:activityId` `(*)`
 
 Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)
 
@@ -430,7 +436,7 @@ If the API successfully edits the activity, the following object will be returne
 }
 ```
 
-### `GET /activities/:activityId/routines`
+### `GET /api/activities/:activityId/routines`
 
 This route returns a list of public routines which feature that activity
 
@@ -447,12 +453,14 @@ There are no request parameters.
   * `isPublic` (`boolean`): Whether or not the routine should be visible to all users (will always be true for public routes)
   * `name` (`string`): This is the name (or title) of the routine.
   * `goal` (`string`): This is like the description of the routine.
-  * `routine` (`array` of `routine` objects): An array of activities associated with this routine.
+  * `activity` (`array` of `activity` objects): An array of activities associated with this routine.
     * `id` (`number`): This is the database identifier for the `activity`
     * `name` (`string`): This is the name (or title) of the activity.
     * `description` (`string`): This is the description of the activity.
     * `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
     * `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+    * `routineActivityId` (`number`): This is the database identifier for the `routine_activity`
+    * `routineId` (`number`): This is the database identifier for the `routine`
 
 #### Sample Call
 
@@ -485,14 +493,18 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/activities/3/routines', {
                 "name": "bench press",
                 "description": "Lift a safe amount, but push yourself!",
                 "duration": 8,
-                "count": 10
+                "count": 10,
+                "routineActivityId": 6,
+                "routineId": 2
             },
             {
                 "id": 4,
                 "name": "Push Ups",
                 "description": "Pretty sure you know what to do!",
                 "duration": 7,
-                "count": 10
+                "count": 10,
+                "routineActivityId": 7,
+                "routineId": 2
             }
         ]
     }
@@ -501,7 +513,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/activities/3/routines', {
 
 ## Routines Endpoints
 
-### `GET /routines`
+### `GET /api/routines`
 
 This route returns a list of all public routines
 
@@ -518,12 +530,14 @@ There are no request parameters.
   * `isPublic` (`boolean`): Whether or not the routine should be visible to all users (will always be true for public routes)
   * `name` (`string`): This is the name (or title) of the routine.
   * `goal` (`string`): This is like the description of the routine.
-  * `routine` (`array` of `routine` objects): An array of activities associated with this routine.
+  * `activity` (`array` of `activity` objects): An array of activities associated with this routine.
     * `id` (`number`): This is the database identifier for the `activity`
     * `name` (`string`): This is the name (or title) of the activity.
     * `description` (`string`): This is the description of the activity.
     * `duration` (`number`): This is how long (in minutes) this activity should be performed for this routine.
     * `count` (`number`): This is the number of times (reps) this activity should be performed for this routine.
+    * `routineActivityId` (`number`): This is the database identifier for the `routine_activity`
+    * `routineId` (`number`): This is the database identifier for the `routine`
 
 #### Sample Call
 
@@ -556,14 +570,18 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/routines', {
                 "name": "bench press",
                 "description": "Lift a safe amount, but push yourself!",
                 "duration": 8,
-                "count": 10
+                "count": 10,
+                "routineActivityId": 6,
+                "routineId": 2
             },
             {
                 "id": 4,
                 "name": "Push Ups",
                 "description": "Pretty sure you know what to do!",
                 "duration": 7,
-                "count": 10
+                "count": 10,
+                "routineActivityId": 7,
+                "routineId": 2
             }
         ]
     },
@@ -594,7 +612,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/routines', {
 ]
 ```
 
-### `POST /routines` `(*)`
+### `POST /api/routines` `(*)`
 
 A request to this endpoint will attempt to create a new routine. You must pass a valid token with this request, or it will be rejected.
 
@@ -643,7 +661,7 @@ If the API creates a new routine, the following object will be returned:
 }
 ```
 
-### `PATCH /routines/:routineId` `(**)`
+### `PATCH /api/routines/:routineId` `(**)`
 
 Update a routine, notably change public/private, the name, or the goal
 
@@ -691,7 +709,7 @@ If the API successfully edits the routine, the following object will be returned
 }
 ```
 
-### `DELETE /routines/:routineId` `(**)`
+### `DELETE /api/routines/:routineId` `(**)`
 
 Hard delete a routine. Make sure to delete all the `routineActivities` whose routine is the one being deleted.
 
@@ -739,7 +757,7 @@ fetch('http://fitnesstrac-kr.herokuapp.com/api/routines/6', {
 }
 ```
 
-### `POST /routines/:routineId/activities`
+### `POST /api/routines/:routineId/activities`
 
 Attaches a single activity to a routine. Prevents duplication on `(routineId, activityId)` pair.
 
@@ -790,7 +808,7 @@ If the API associates the activity with the routine, the following object will b
 
 ## routine_activities Endpoints
 
-### `PATCH /routine_activities/:routineActivityId` `(**)`
+### `PATCH /api/routine_activities/:routineActivityId` `(**)`
 
 Update the count or duration on the routine activity
 
@@ -837,7 +855,7 @@ If the API successfully edits the routine, the following object will be returned
 }
 ```
 
-### `DELETE /routine_activities/:routineActivityId` `(**)`
+### `DELETE /api/routine_activities/:routineActivityId` `(**)`
 
 Remove an activity from a routine (hard deleting routine_activity), dissociating an activity from a routine.
 
