@@ -166,7 +166,7 @@
 <h3 id="-get-api-users-username-routines-"><code>GET /api/users/:username/routines</code></h3>
 <p>This route returns a list of public routines for a particular user.</p>
 <h4 id="request-parameters">Request Parameters</h4>
-<p>There are no request parameters, but <strong>if a token is sent in the Authorization header, both public and private routines will be sent back foor the requested user</strong>.</p>
+<p>There are no request parameters, but <strong>if a token is sent in the Authorization header (and if this token's logged in user matches the user for which these routines are being requested), both public and private routines will be sent back for the requested user</strong>.</p>
 <h4 id="return-parameters">Return Parameters</h4>
 <p>(<code>array</code> of <code>object</code>):</p>
 <ul>
