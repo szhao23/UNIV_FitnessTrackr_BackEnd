@@ -202,7 +202,7 @@ This route returns a list of public routines for a particular user.
 
 #### Request Parameters
 
-There are no request parameters, but **if a token is sent in the Authorization header, both public and private routines will be sent back foor the requested user**.
+There are no request parameters, but **if a token is sent in the Authorization header (and if this token's logged in user matches the user for which these routines are being requested), both public and private routines will be sent back for the requested user**.
 
 #### Return Parameters
 
