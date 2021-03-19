@@ -25,3 +25,6 @@ Currently, test suites must be run separately.  I have not yet fixed this.
 
     npm run test:watch api.spec
 
+### Documentation
+
+To edit the documentation, edit the `FitnessTrackr API Documentation.md` file, then copy the markdown content and use https://markdowntohtml.com/ to convert to html.  Paste the html into `public/index.html` in the `div` with `id="doc-html"`.
