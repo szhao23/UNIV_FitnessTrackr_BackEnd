@@ -45,14 +45,13 @@ router.patch('/:routineId', requireUser, requiredNotSent({requiredParams: ['name
         name: 'NotFound',
         message: `No routine by ID ${routineId}`
       })
+    } else if(req.user.id !== routineToUpdate.creatorId) {
+      res.status(403);
+      next({
+        name: "WrongUserError",
+        message: "You must be the same user who created this routine to perform this action"
+      });
     } else {
-      if(req.user.id !== routineToUpdate.creatorId) {
-        res.status(403);
-        next({
-          name: "WrongUserError",
-          message: "You must be the same user who created this routine to perform this action"
-        });
-      }
       const updatedRoutine = await updateRoutine({id: routineId, name, goal, isPublic});
       if(updatedRoutine) {
         res.send(updatedRoutine);
@@ -78,17 +77,16 @@ router.delete('/:routineId', requireUser, async (req, res, next) => {
         name: 'NotFound',
         message: `No routine by ID ${routineId}`
       })
+    } else if(req.user.id !== routineToUpdate.creatorId) {
+      res.status(403);
+      next({
+        name: "WrongUserError",
+        message: "You must be the same user who created this routine to perform this action"
+      });
     } else {
-      if(req.user.id !== routineToUpdate.creatorId) {
-        res.status(403);
-        next({
-          name: "WrongUserError",
-          message: "You must be the same user who created this routine to perform this action"
-        });
-      }
+      const deletedRoutine = await destroyRoutine(routineId)
+      res.send({success: true, ...deletedRoutine});
     }
-    const deletedRoutine = await destroyRoutine(routineId)
-    res.send({success: true, ...deletedRoutine});
   } catch (error) {
     next(error);
   }
